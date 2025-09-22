@@ -89,8 +89,7 @@
                 0 0 60px rgba(0, 255, 255, 0.3),
                 inset 0 0 60px rgba(0, 255, 255, 0.1),
                 0 20px 40px rgba(0, 0, 0, 0.5);
-            border: 2px solid;
-            border-image: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff) 1;
+            border: 2px solid #00ffff;
             max-width: 90vw;
             position: relative;
             z-index: 10;
@@ -103,7 +102,7 @@
             left: -2px;
             right: -2px;
             bottom: -2px;
-            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff);
+            background: #00ffff;
             border-radius: 22px;
             z-index: -1;
             animation: borderGlow 3s ease-in-out infinite alternate;
@@ -119,14 +118,11 @@
             margin-bottom: 20px;
             font-size: 2.5em;
             font-weight: 900;
+            color: #00ffff;
             text-shadow: 
                 0 0 10px #00ffff,
                 0 0 20px #00ffff,
                 0 0 30px #00ffff;
-            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
             animation: textGlow 2s ease-in-out infinite alternate;
         }
 
@@ -255,11 +251,10 @@
             height: 50px;
             border-radius: 50%;
             position: absolute;
-            top: 5px;
-            left: 5px;
-            transform: scale(0);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
             animation: dropToken 0.8s ease-out forwards;
-            position: relative;
             overflow: hidden;
         }
 
@@ -301,25 +296,25 @@
 
         @keyframes dropToken {
             0% {
-                transform: translateY(-400px) scale(0.8) rotateY(180deg);
+                transform: translate(-50%, -450px) scale(0.8) rotateY(180deg);
             }
             50% {
-                transform: translateY(0) scale(1.2) rotateY(90deg);
+                transform: translate(-50%, -50%) scale(1.2) rotateY(90deg);
             }
             100% {
-                transform: translateY(0) scale(1) rotateY(0deg);
+                transform: translate(-50%, -50%) scale(1) rotateY(0deg);
             }
         }
 
         @keyframes cyberPulse {
             0%, 100% {
-                transform: scale(1);
+                transform: translate(-50%, -50%) scale(1);
                 box-shadow: 
                     0 0 20px rgba(0, 255, 255, 0.8),
                     inset 0 0 20px rgba(0, 229, 255, 0.3);
             }
             50% {
-                transform: scale(1.15);
+                transform: translate(-50%, -50%) scale(1.15);
                 box-shadow: 
                     0 0 40px rgba(0, 255, 255, 1),
                     0 0 60px rgba(255, 0, 255, 0.8),
@@ -333,8 +328,8 @@
         }
 
         .reset-btn {
-            background: linear-gradient(135deg, #ff006e, #8338ec, #3a86ff);
-            color: white;
+            background: linear-gradient(135deg, #00ffff, #008888);
+            color: #000;
             border: none;
             padding: 15px 30px;
             border-radius: 30px;
@@ -344,7 +339,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 
-                0 0 20px rgba(255, 0, 110, 0.5),
+                0 0 20px rgba(0, 255, 255, 0.5),
                 0 4px 15px rgba(0, 0, 0, 0.3);
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -366,7 +361,7 @@
         .reset-btn:hover {
             transform: translateY(-3px);
             box-shadow: 
-                0 0 30px rgba(255, 0, 110, 0.8),
+                0 0 30px rgba(0, 255, 255, 0.8),
                 0 6px 20px rgba(0, 0, 0, 0.4);
         }
 
@@ -394,13 +389,11 @@
             z-index: 1000;
             box-shadow: 
                 0 0 60px rgba(0, 255, 255, 0.5),
-                0 0 100px rgba(255, 0, 255, 0.3),
                 inset 0 0 40px rgba(0, 255, 255, 0.1);
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
-            border: 2px solid;
-            border-image: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ffff) 1;
+            border: 2px solid #00ffff;
         }
 
         .victory-message.show {
@@ -412,13 +405,11 @@
         @keyframes victoryGlow {
             0% { 
                 box-shadow: 
-                    0 0 60px rgba(0, 255, 255, 0.5),
-                    0 0 100px rgba(255, 0, 255, 0.3);
+                    0 0 60px rgba(0, 255, 255, 0.5);
             }
             100% { 
                 box-shadow: 
-                    0 0 80px rgba(0, 255, 255, 0.8),
-                    0 0 120px rgba(255, 0, 255, 0.5);
+                    0 0 80px rgba(0, 255, 255, 0.8);
             }
         }
 
@@ -426,14 +417,11 @@
             margin-bottom: 15px;
             font-size: 2em;
             font-weight: 900;
+            color: #00ffff;
             text-shadow: 
                 0 0 10px #00ffff,
-                0 0 20px #ff00ff,
-                0 0 30px #ffff00;
-            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+                0 0 20px #00ffff,
+                0 0 30px #00ffff;
         }
 
         @media (max-width: 768px) {
@@ -445,8 +433,6 @@
             .token {
                 width: 35px;
                 height: 35px;
-                top: 5px;
-                left: 5px;
             }
             
             h1 {
@@ -467,8 +453,6 @@
             .token {
                 width: 25px;
                 height: 25px;
-                top: 5px;
-                left: 5px;
             }
             
             .board {
