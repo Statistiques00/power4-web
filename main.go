@@ -14,6 +14,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/", handler)
-	http.ListenAndServe(":80", nil)
-	fmt.Print("Le server tourne")
+	fmt.Println("Serveur démarré sur http://localhost:8080")
+	http.ListenAndServe(":8080", nil)
 }
