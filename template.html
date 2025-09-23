@@ -2,14 +2,16 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-<title>CONNECT FOUR</title>
+    <title>CONNECT FOUR</title>
     <link rel="stylesheet" href="/style.css">
     <style>
         .center-board { display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 8px; }
     </style>
 </head>
 <body>
+    <!-- Titre principal du jeu -->
     <h1 style="font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace; letter-spacing:0.08em;">CONNECT FOUR</h1>
+    <!-- Affichage du joueur courant -->
     <div style="margin-bottom:10px; font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace; font-size:1.1em;">
         {{if not .GameOver}}
             <span>
@@ -21,7 +23,9 @@
             </span>
         {{end}}
     </div>
+    <!-- Plateau de jeu généré dynamiquement -->
     <div class="center-board">{{.BoardHTML}}</div>
+    <!-- Message de victoire ou de match nul -->
     {{if .Winner}}
         <div class="winner">🎉 {{if eq .Winner 1}}Player <span style="color:#c44536;">Red</span>{{else}}Player <span style="color:#ffe066;">Yellow</span>{{end}} gagne!</div>
     {{else if .GameOver}}
