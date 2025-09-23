@@ -220,8 +220,8 @@ func main() {
 	if err := loadTemplate(); err != nil {
 		panic("Erreur chargement template: " + err.Error())
 	}
-	http.HandleFunc("/", handler)
+	http.HandleFunc("/connect4", handler)
 	http.Handle("/style.css", http.FileServer(http.Dir(".")))
-	fmt.Println("Serveur Puissance 4 Go sur http://localhost:8080")
+	fmt.Println("Serveur Puissance 4 Go sur http://localhost:8080/connect4")
 	http.ListenAndServe(":8080", nil)
 }
