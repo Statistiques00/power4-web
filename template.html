@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Puissance 4 </title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <h1>Puissance 4</h1>
+    <div style="margin-bottom:10px;">
+        {{if not .GameOver}}
+            <span>Joueur {{.CurrentPlayer}} ({{if eq .CurrentPlayer 1}}🔴{{else}}🟡{{end}})</span>
+        {{end}}
+    </div>
+    <div>{{.BoardHTML}}</div>
+    {{if .Winner}}
+        <div class="winner">🎉 Joueur {{.Winner}} a gagné !</div>
+    {{else if .GameOver}}
+        <div class="draw">Match nul !</div>
+    {{end}}
+</body>
+</html>

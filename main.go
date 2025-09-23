@@ -93,7 +93,12 @@ func (g *Game) isDraw() bool {
 }
 
 func renderBoard(g *Game) template.HTML {
-	html := "<table class='board'>"
+	tokenClass := "col-btn-red"
+	if g.CurrentPlayer == 2 {
+		tokenClass = "col-btn-yellow"
+	}
+	html := "<form method='POST'><table class='board'>\n"
+	// Plateau
 	for r := 0; r < ROWS; r++ {
 		html += "<tr>"
 		for c := 0; c < COLS; c++ {
@@ -108,52 +113,29 @@ func renderBoard(g *Game) template.HTML {
 		}
 		html += "</tr>"
 	}
+	// Ligne de boutons sous le plateau
+	html += "<tr>"
+	for c := 0; c < COLS; c++ {
+		if !g.GameOver {
+			html += "<td><button class='col-btn " + tokenClass + "' name='col' value='" + strconv.Itoa(c) + "'>&#8593;</button></td>"
+		} else {
+			html += "<td></td>"
+		}
+	}
+	html += "</tr>"
+
 	html += "</table>"
+	html += "<div class='controls'><button name='reset' value='1'>Nouvelle partie</button></div></form>"
 	return template.HTML(html)
 }
 
-var pageTmpl = template.Must(template.New("page").Parse(`
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Puissance 4 en Go</title>
-    <style>
-        body { background: #181c24; color: #fff; font-family: Arial, sans-serif; text-align: center; }
-        .board { margin: 30px auto; border-spacing: 5px; }
-        .board td { width: 60px; height: 60px; background: #222; border-radius: 50%; position: relative; }
-        .token { width: 50px; height: 50px; border-radius: 50%; margin: 5px auto; }
-        .red { background: linear-gradient(135deg, #ff4b2b, #ff416c); box-shadow: 0 0 10px #ff416c; }
-        .yellow { background: linear-gradient(135deg, #ffe259, #ffa751); box-shadow: 0 0 10px #ffe259; }
-        .controls { margin: 20px; }
-        .controls button { padding: 10px 20px; font-size: 1.2em; margin: 0 5px; border-radius: 10px; border: none; background: #333; color: #fff; cursor: pointer; }
-        .controls button:hover { background: #444; }
-        .winner { font-size: 2em; color: #ffe259; margin: 20px; }
-        .draw { font-size: 2em; color: #aaa; margin: 20px; }
-    </style>
-</head>
-<body>
-    <h1>Puissance 4 (Go Only)</h1>
-    <form method="POST" class="controls">
-        {{if not .GameOver}}
-            <label>Joueur {{.CurrentPlayer}} ({{if eq .CurrentPlayer 1}}🔴{{else}}🟡{{end}}) : Choisissez une colonne</label><br>
-            {{range $i, $v := .Cols}}
-                <button name="col" value="{{$i}}">{{$i | add1}}</button>
-            {{end}}
-        {{end}}
-        <button name="reset" value="1">Nouvelle partie</button>
-    </form>
-    <div>{{.BoardHTML}}</div>
-    {{if .Winner}}
-        <div class="winner">🎉 Joueur {{.Winner}} a gagné !</div>
-    {{else if .GameOver}}
-        <div class="draw">Match nul !</div>
-    {{end}}
-</body>
-</html>
-`))
+var pageTmpl *template.Template
 
-func add1(i int) int { return i + 1 }
+func loadTemplate() error {
+	var err error
+	pageTmpl, err = template.ParseFiles("template.html")
+	return err
+}
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	mutex.Lock()
@@ -176,19 +158,21 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		CurrentPlayer int
 		Winner        int
 		GameOver      bool
-		Cols          []int
 	}{
 		BoardHTML:     renderBoard(game),
 		CurrentPlayer: game.CurrentPlayer,
 		Winner:        game.Winner,
 		GameOver:      game.GameOver,
-		Cols:          []int{0, 1, 2, 3, 4, 5, 6},
 	}
-	pageTmpl.Funcs(template.FuncMap{"add1": add1}).Execute(w, data)
+	pageTmpl.Execute(w, data)
 }
 
 func main() {
+	if err := loadTemplate(); err != nil {
+		panic("Erreur chargement template: " + err.Error())
+	}
 	http.HandleFunc("/", handler)
+	http.Handle("/style.css", http.FileServer(http.Dir(".")))
 	fmt.Println("Serveur Puissance 4 Go sur http://localhost:8080")
 	http.ListenAndServe(":8080", nil)
 }
