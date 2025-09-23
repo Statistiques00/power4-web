@@ -1,51 +1,127 @@
-body { background: #181c24; color: #fff; font-family: Arial, sans-serif; text-align: center; }
-.board { margin: 30px auto; border-spacing: 5px; }
-.board td { width: 60px; height: 60px; background: #222; border-radius: 50%; position: relative; }
-.token { width: 50px; height: 50px; border-radius: 50%; margin: 5px auto; }
-.red { background: linear-gradient(135deg, #ff4b2b, #ff416c); box-shadow: 0 0 10px #ff416c; }
-.yellow { background: linear-gradient(135deg, #ffe259, #ffa751); box-shadow: 0 0 10px #ffe259; }
+body {
+    background: #0d1b2a;
+    color: #ffeccc;
+    font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+    font-size: 2.8em;
+    letter-spacing: 0.08em;
+    margin-top: 40px;
+    margin-bottom: 18px;
+    color: #ffeccc;
+    text-shadow: none;
+}
+
+.board {
+    margin: 30px auto 0 auto;
+    border-spacing: 14px;
+    background: none;
+}
+
+.board td {
+    width: 80px;
+    height: 80px;
+    background: none;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    position: relative;
+}
+
+.token {
+    width: 66px;
+    height: 66px;
+    border-radius: 50%;
+    margin: 0 auto;
+    box-shadow: none;
+    border: none;
+}
+
+.red {
+    background: #c44536;
+    border: 3.5px solid #ffeccc;
+}
+
+.yellow {
+    background: #ffe066;
+    border: 3.5px solid #ffeccc;
+}
+
+/* Cercles vides pour cases non jouées */
+.board td:empty::after {
+    content: '';
+    display: block;
+    width: 66px;
+    height: 66px;
+    margin: 0 auto;
+    border-radius: 50%;
+    border: 3.5px solid #274472;
+    background: none;
+}
+
 .col-btn {
     width: 100%;
-    height: 48px;
-    font-size: 2.2em;
-    background: linear-gradient(135deg, #232526 0%, #414345 100%);
-    color: #ffe259;
-    border: none;
-    border-radius: 18px 18px 40px 40px;
+    height: 54px;
+    font-size: 2.1em;
+    background: #16213e;
+    color: #ffeccc;
+    border: 2.5px solid #274472;
+    border-radius: 10px 10px 20px 20px;
     cursor: pointer;
-    box-shadow: 0 2px 8px #0008;
-    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-    outline: none;
-    margin-bottom: 2px;
-}
-.col-btn:hover, .col-btn:focus {
-    background: linear-gradient(135deg, #ffe259 0%, #ffa751 100%);
-    color: #222;
-    box-shadow: 0 0 18px #ffe259, 0 2px 8px #0008;
-    transform: translateY(-3px) scale(1.08);
+    font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+    margin-top: 8px;
+    margin-bottom: 0;
+    transition: background 0.15s, color 0.15s;
+    box-shadow: none;
 }
 .col-btn-red {
-    background: linear-gradient(135deg, #ff4b2b 0%, #ff416c 100%);
-    color: #fff;
-    box-shadow: 0 0 10px #ff416c, 0 2px 8px #0008;
-}
-.col-btn-red:hover, .col-btn-red:focus {
-    background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
-    color: #fff;
-    box-shadow: 0 0 18px #ff416c, 0 2px 8px #0008;
+    background: #c44536;
+    color: #ffeccc;
+    border: 2.5px solid #ffeccc;
 }
 .col-btn-yellow {
-    background: linear-gradient(135deg, #ffe259 0%, #ffa751 100%);
-    color: #222;
-    box-shadow: 0 0 10px #ffe259, 0 2px 8px #0008;
+    background: #ffe066;
+    color: #16213e;
+    border: 2.5px solid #ffeccc;
 }
-.col-btn-yellow:hover, .col-btn-yellow:focus {
-    background: linear-gradient(135deg, #ffa751 0%, #ffe259 100%);
-    color: #222;
-    box-shadow: 0 0 18px #ffe259, 0 2px 8px #0008;
+.col-btn:hover, .col-btn:focus {
+    background: #274472;
+    color: #ffe066;
 }
-.controls { margin: 20px; }
-.controls button { padding: 10px 20px; font-size: 1.2em; margin: 0 5px; border-radius: 10px; border: none; background: #333; color: #fff; cursor: pointer; }
-.controls button:hover { background: #444; }
-.winner { font-size: 2em; color: #ffe259; margin: 20px; }
-.draw { font-size: 2em; color: #aaa; margin: 20px; }
+.controls {
+    margin: 48px 0 0 0;
+}
+.controls button {
+    padding: 10px 26px;
+    font-size: 1.3em;
+    border-radius: 8px;
+    border: 2.5px solid #274472;
+    background: #16213e;
+    color: #ffeccc;
+    font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+    cursor: pointer;
+    margin: 0 4px;
+    box-shadow: none;
+    transition: background 0.15s, color 0.15s;
+}
+.controls button:hover {
+    background: #274472;
+    color: #ffe066;
+}
+.winner {
+    font-size: 2em;
+    color: #ffe066;
+    margin: 48px 0 0 0;
+    font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+}
+.draw {
+    font-size: 2em;
+    color: #aaa;
+    margin: 48px 0 0 0;
+    font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+}

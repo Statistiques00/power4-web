@@ -113,16 +113,14 @@ func renderBoard(g *Game) template.HTML {
 		}
 		html += "</tr>"
 	}
-	// Ligne de boutons sous le plateau
-	html += "<tr>"
-	for c := 0; c < COLS; c++ {
-		if !g.GameOver {
+	// Ligne de boutons sous le plateau uniquement si la partie n'est pas finie
+	if !g.GameOver {
+		html += "<tr>"
+		for c := 0; c < COLS; c++ {
 			html += "<td><button class='col-btn " + tokenClass + "' name='col' value='" + strconv.Itoa(c) + "'>&#8593;</button></td>"
-		} else {
-			html += "<td></td>"
 		}
+		html += "</tr>"
 	}
-	html += "</tr>"
 
 	html += "</table>"
 	html += "<div class='controls'><button name='reset' value='1'>Nouvelle partie</button></div></form>"
