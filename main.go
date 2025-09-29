@@ -98,7 +98,6 @@ func renderBoard(g *Game) template.HTML {
 		tokenClass = "col-btn-yellow"
 	}
 	html := "<form method='POST'><table class='board'>\n"
-	// Plateau
 	for r := 0; r < ROWS; r++ {
 		html += "<tr>"
 		for c := 0; c < COLS; c++ {
@@ -113,7 +112,6 @@ func renderBoard(g *Game) template.HTML {
 		}
 		html += "</tr>"
 	}
-	// Ligne de boutons sous le plateau
 	html += "<tr>"
 	for c := 0; c < COLS; c++ {
 		if !g.GameOver {
