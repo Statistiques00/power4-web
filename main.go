@@ -160,9 +160,6 @@ func renderBoard(g *Game) template.HTML {
 		}
 		html += "</tr>"
 	}
-	html += "<tr>"
-	for c := 0; c < COLS; c++ {
-		if !g.GameOver {
 	// Ligne de boutons sous le plateau uniquement si la partie n'est pas finie
 	if !g.GameOver {
 		html += "<tr>"
@@ -171,7 +168,6 @@ func renderBoard(g *Game) template.HTML {
 		}
 		html += "</tr>"
 	}
-
 	html += "</table>"
 	html += "<div class='controls'><button name='reset' value='1'>Nouvelle partie</button></div></form>"
 	return template.HTML(html)
