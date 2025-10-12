@@ -8,39 +8,71 @@ body {
     padding: 0;
 }
 
+/* Board container alignment with moderate responsive spacing */
+.center-board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* min 32px, prefer 8vh, cap at 120px */
+    margin-top: clamp(32px, 8vh, 120px);
+}
+
+/* Design tokens */
+:root {
+    --token-size: 66px;
+    --token-border: 3.5px;
+    --board-gap: 14px;
+    --selector-gap: 8px; /* distance between selector and top row */
+}
+
 /* Titre principal */
 h1 {
-    font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
-    font-size: 2.8em;
+    font-family: 'Press Start 2P', 'Fira Mono', 'Consolas', 'Menlo', monospace;
+    font-size: 2.6em;
     letter-spacing: 0.08em;
     margin-top: 40px;
     margin-bottom: 18px;
     color: #ffeccc;
-    text-shadow: none;
+    text-shadow: 0 0 2px #fff2, 0 0 8px #00d9ff22, 0 0 18px #00d9ff22;
 }
 
 /* Plateau du jeu (tableau) */
 .board {
     margin: 30px auto 0 auto;
-    border-spacing: 14px;
+    border-spacing: var(--board-gap);
+    border-collapse: separate; /* ensure border-spacing applies */
     background: none;
+}
+
+/* Wrapper to allow absolute positioning of selector over the board */
+.board-wrap {
+    position: relative;
+    display: inline-block;
+    margin-top: 8px; /* smaller extra space for selector */
 }
 
 /* Cases du plateau */
 .board td {
-    width: 80px;
+    width: 80px; /* cell size can be different from token size */
     height: 80px;
     background: none;
     border-radius: 50%;
     border: none;
     padding: 0;
     position: relative;
+    cursor: pointer;
 }
 
 /* Jetons */
+.token-wrap {
+    width: var(--token-size);
+    height: var(--token-size);
+    margin: 0 auto;
+}
 .token {
-    width: 66px;
-    height: 66px;
+    width: var(--token-size);
+    height: var(--token-size);
     border-radius: 50%;
     margin: 0 auto;
     box-shadow: none;
@@ -50,24 +82,24 @@ h1 {
 /* Jeton rouge */
 .red {
     background: #c44536;
-    border: 3.5px solid #ffeccc;
+    border: var(--token-border) solid #ffeccc;
 }
 
 /* Jeton jaune */
 .yellow {
     background: #ffe066;
-    border: 3.5px solid #ffeccc;
+    border: var(--token-border) solid #ffeccc;
 }
 
 /* Cercles vides pour cases non jouées */
 .board td:empty::after {
     content: '';
     display: block;
-    width: 66px;
-    height: 66px;
+    width: var(--token-size); /* match .token */
+    height: var(--token-size); /* match .token */
     margin: 0 auto;
     border-radius: 50%;
-    border: 3.5px solid #274472;
+    border: var(--token-border) solid #274472;
     background: none;
 }
 
@@ -137,26 +169,71 @@ h1 {
 
 /* Message de victoire */
 .winner {
-    font-size: 2.8em;
-    color: #ffe066;
+    font-size: 1.6em;
+    color: #00e5ff;
     margin: 48px 0 0 0;
-    font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
-    animation: winner-pop 1.1s cubic-bezier(.4,2,.6,.9);
-    letter-spacing: 0.04em;
-    text-shadow: 0 2px 16px #0070ff99, 0 0 2px #fff;
+    font-family: 'Press Start 2P', monospace;
+    animation: winner-flicker 1.2s infinite steps(2, end);
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 2px #0ff, 0 0 10px #0ff3, 0 0 18px #0ff2;
     text-align: center;
 }
-@keyframes winner-pop {
-    0% { opacity: 0; transform: scale(0.7) translateY(-40px); }
-    60% { opacity: 1; transform: scale(1.15) translateY(0); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
+@keyframes winner-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.87; }
 }
 
 /* Message de match nul */
 .draw {
-    font-size: 2em;
-    color: #aaa;
+    font-size: 1.2em;
+    color: #8ab6ff;
     margin: 48px 0 0 0;
-    font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+    font-family: 'Press Start 2P', monospace;
     text-align: center;
+    text-shadow: 0 0 2px #8ab6ff88;
+}
+
+/* Selector token displayed above columns */
+.selector {
+    position: absolute;
+    left: 0; top: 0;
+    border-radius: 50%;
+    border: var(--token-border) solid #ffeccc; /* match token border */
+    width: var(--token-size); height: var(--token-size);   /* match token size */
+    z-index: 5;
+    pointer-events: none;
+    transform: translate(-50%, -100%); /* center horizontally over column, sit above board */
+}
+.selector-red { background: #c44536; }
+.selector-yellow { background: #ffe066; }
+
+/* Color selector via wrapper player class */
+.board-wrap.p1 #selector { background: #c44536; }
+.board-wrap.p2 #selector { background: #ffe066; }
+
+/* Animate the last played token to drop in */
+.token-wrap.just-played { animation: drop-in 300ms ease-out; transform-origin: top center; }
+@keyframes drop-in {
+    0% { transform: translateY(-40px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Ensure the last played winning token both drops and then bounces */
+/* With wrapper separation, no need to stack animations on the same element */
+
+/* Highlight the selected column cells */
+.board td.col-selected::after {
+    /* default highlight (will be overridden by player-specific) */
+    border-color: #ffe066;
+    box-shadow: 0 0 10px #ffe06655, 0 0 2px #ffeccc88 inset;
+}
+
+/* Player-specific selected column border color */
+.board-wrap.p1 .board td.col-selected::after {
+    border-color: #c44536;
+    box-shadow: 0 0 10px #c4453655, 0 0 2px #ffeccc88 inset;
+}
+.board-wrap.p2 .board td.col-selected::after {
+    border-color: #ffe066;
+    box-shadow: 0 0 10px #ffe06655, 0 0 2px #ffeccc88 inset;
 }

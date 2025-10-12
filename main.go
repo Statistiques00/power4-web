@@ -18,6 +18,8 @@ type Game struct {
 	CurrentPlayer int
 	Winner        int
 	GameOver      bool
+	LastRow       int
+	LastCol       int
 }
 
 var (
@@ -31,6 +33,8 @@ func NewGame() *Game {
 		CurrentPlayer: 1,
 		Winner:        0,
 		GameOver:      false,
+		LastRow:       -1,
+		LastCol:       -1,
 	}
 }
 
@@ -43,6 +47,8 @@ func (g *Game) DropToken(col int) bool {
 	for row := ROWS - 1; row >= 0; row-- {
 		if g.Board[row][col] == 0 {
 			g.Board[row][col] = g.CurrentPlayer
+			g.LastRow = row
+			g.LastCol = col
 			if g.checkWin(row, col) {
 				g.Winner = g.CurrentPlayer
 				g.GameOver = true
@@ -131,9 +137,9 @@ func (g *Game) getWinningPositions() [][2]int {
 
 // renderBoard génère le HTML du plateau et des boutons de jeu selon l'état de la partie.
 func renderBoard(g *Game) template.HTML {
-	tokenClass := "col-btn-red"
+	playerClass := "p1"
 	if g.CurrentPlayer == 2 {
-		tokenClass = "col-btn-yellow"
+		playerClass = "p2"
 	}
 	winning := map[[2]int]bool{}
 	if g.GameOver && g.Winner != 0 {
@@ -141,35 +147,43 @@ func renderBoard(g *Game) template.HTML {
 			winning[pos] = true
 		}
 	}
-	html := "<form method='POST'><table class='board'>\n"
+	html := "<form method='POST' id='board-form'><input type='hidden' name='col' id='col-input'/>\n"
+	html += "<div class='board-wrap " + playerClass + "' id='board-wrap'>\n"
+	html += "<table class='board' id='board' data-gameover='"
+	if g.GameOver {
+		html += "1'"
+	} else {
+		html += "0'"
+	}
+	html += " data-current='" + strconv.Itoa(g.CurrentPlayer) + "'>\n"
 	for r := 0; r < ROWS; r++ {
 		html += "<tr>"
 		for c := 0; c < COLS; c++ {
 			cell := ""
-			cls := ""
+			tokenCls := ""
+			wrapCls := ""
 			if winning[[2]int{r, c}] {
-				cls = " winner-token"
+				tokenCls = " winner-token"
+			}
+			if g.LastRow == r && g.LastCol == c {
+				wrapCls = " just-played"
 			}
 			switch g.Board[r][c] {
 			case 1:
-				cell = "<div class='token red" + cls + "'></div>"
+				cell = "<div class='token-wrap" + wrapCls + "'><div class='token red" + tokenCls + "'></div></div>"
 			case 2:
-				cell = "<div class='token yellow" + cls + "'></div>"
+				cell = "<div class='token-wrap" + wrapCls + "'><div class='token yellow" + tokenCls + "'></div></div>"
 			}
-			html += "<td>" + cell + "</td>"
+			html += "<td data-col='" + strconv.Itoa(c) + "'>" + cell + "</td>"
 		}
 		html += "</tr>"
 	}
-	// Ligne de boutons sous le plateau uniquement si la partie n'est pas finie
-	if !g.GameOver {
-		html += "<tr>"
-		for c := 0; c < COLS; c++ {
-			html += "<td><button class='col-btn " + tokenClass + "' name='col' value='" + strconv.Itoa(c) + "'>&#8593;</button></td>"
-		}
-		html += "</tr>"
-	}
-	html += "</table>"
-	html += "<div class='controls'><button name='reset' value='1'>Nouvelle partie</button></div></form>"
+	html += "</table>\n"
+	// selector color via wrapper class (p1/p2) and CSS, keep base selector class only
+	html += "<div id='selector' class='selector' style='display:none'></div>\n"
+	html += "</div>" // end board-wrap
+	html += "<div class='controls'><button name='reset' value='1'>Nouvelle partie</button></div>"
+	html += "</form>"
 	return template.HTML(html)
 }
 
@@ -220,6 +234,7 @@ func main() {
 	}
 	http.HandleFunc("/connect4", handler)
 	http.Handle("/style.css", http.FileServer(http.Dir(".")))
+	http.Handle("/favicon.svg", http.FileServer(http.Dir(".")))
 	fmt.Println("Serveur Puissance 4 Go sur http://localhost:8080/connect4")
 	http.ListenAndServe(":8080", nil)
 }
