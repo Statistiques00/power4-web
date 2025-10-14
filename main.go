@@ -17,6 +17,21 @@ const (
 	GravityUp
 )
 
+type GameMode int
+
+const (
+	ModeHumanVsHuman GameMode = iota
+	ModeHumanVsAI
+)
+
+type AILevel int
+
+const (
+	AIEasy AILevel = iota
+	AIMedium
+	AIHard
+)
+
 // Ajoute un champ Mode à Game pour retenir le mode de jeu
 type Game struct {
 	Board         [][]int
@@ -31,6 +46,8 @@ type Game struct {
 	Difficulty    string
 	Username      string
 	Mode          string // "normal" ou "inverse"
+	GameMode      GameMode
+	AILevel       AILevel
 }
 
 var (
@@ -38,18 +55,19 @@ var (
 	mutex sync.Mutex
 )
 
-func NewGame(rows, cols, prefill int, difficulty, username, mode string) *Game {
+func NewGame(rows, cols, prefill int, difficulty, username, mode string, gameMode GameMode, aiLevel AILevel) *Game {
 	board := make([][]int, rows)
 	for i := range board {
 		board[i] = make([]int, cols)
 	}
 	// Prefill random cells
-	rand.Seed(time.Now().UnixNano())
+	source := rand.NewSource(time.Now().UnixNano())
+	rng := rand.New(source)
 	for n := 0; n < prefill; {
-		r := rand.Intn(rows)
-		c := rand.Intn(cols)
+		r := rng.Intn(rows)
+		c := rng.Intn(cols)
 		if board[r][c] == 0 {
-			board[r][c] = rand.Intn(2) + 1
+			board[r][c] = rng.Intn(2) + 1
 			n++
 		}
 	}
@@ -73,6 +91,8 @@ func NewGame(rows, cols, prefill int, difficulty, username, mode string) *Game {
 		Difficulty:    difficulty,
 		Username:      username,
 		Mode:          mode,
+		GameMode:      gameMode,
+		AILevel:       aiLevel,
 	}
 }
 
@@ -161,6 +181,297 @@ func (g *Game) isDraw() bool {
 	return true
 }
 
+// AI Functions
+
+// getValidMoves retourne les colonnes où il est possible de jouer
+func (g *Game) getValidMoves() []int {
+	var moves []int
+	for col := 0; col < g.Cols; col++ {
+		// Vérifie si la colonne n'est pas pleine
+		var canPlay bool
+		if g.Gravity == GravityDown {
+			canPlay = g.Board[0][col] == 0
+		} else {
+			canPlay = g.Board[g.Rows-1][col] == 0
+		}
+		if canPlay {
+			moves = append(moves, col)
+		}
+	}
+	return moves
+}
+
+// checkWinningMove vérifie si jouer dans une colonne ferait gagner le joueur
+func (g *Game) checkWinningMove(col, player int) bool {
+	// Simule le coup
+	var row int
+	if g.Gravity == GravityDown {
+		for row = g.Rows - 1; row >= 0; row-- {
+			if g.Board[row][col] == 0 {
+				break
+			}
+		}
+	} else {
+		for row = 0; row < g.Rows; row++ {
+			if g.Board[row][col] == 0 {
+				break
+			}
+		}
+	}
+
+	if row < 0 || row >= g.Rows || g.Board[row][col] != 0 {
+		return false
+	}
+
+	// Place temporairement le jeton
+	g.Board[row][col] = player
+	win := g.checkWin(row, col)
+	g.Board[row][col] = 0 // Retire le jeton
+
+	return win
+}
+
+// aiEasyMove - IA facile : joue aléatoirement
+func (g *Game) aiEasyMove() int {
+	moves := g.getValidMoves()
+	if len(moves) == 0 {
+		return -1
+	}
+	return moves[rand.Intn(len(moves))]
+}
+
+// aiMediumMove - IA moyenne : bloque les victoires adverses et cherche ses victoires
+func (g *Game) aiMediumMove() int {
+	moves := g.getValidMoves()
+	if len(moves) == 0 {
+		return -1
+	}
+
+	// 1. Cherche un coup gagnant pour l'IA (joueur 2)
+	for _, col := range moves {
+		if g.checkWinningMove(col, 2) {
+			return col
+		}
+	}
+
+	// 2. Bloque un coup gagnant de l'adversaire (joueur 1)
+	for _, col := range moves {
+		if g.checkWinningMove(col, 1) {
+			return col
+		}
+	}
+
+	// 3. Sinon, joue aléatoirement
+	return moves[rand.Intn(len(moves))]
+}
+
+// aiHardMove - IA difficile : utilise minimax
+func (g *Game) aiHardMove() int {
+	moves := g.getValidMoves()
+	if len(moves) == 0 {
+		return -1
+	}
+
+	// Utilise minimax avec une profondeur limitée
+	_, bestCol := g.minimax(4, true, -1000, 1000)
+
+	// Fallback au cas où minimax échoue
+	if bestCol == -1 && len(moves) > 0 {
+		return moves[0]
+	}
+
+	return bestCol
+}
+
+// minimax - Algorithme minimax avec élagage alpha-beta
+func (g *Game) minimax(depth int, isMaximizing bool, alpha, beta int) (int, int) {
+	// Conditions de fin
+	if depth == 0 || g.GameOver {
+		return g.evaluateBoard(), -1
+	}
+
+	moves := g.getValidMoves()
+	if len(moves) == 0 {
+		return 0, -1 // Match nul
+	}
+
+	bestCol := moves[0]
+
+	if isMaximizing {
+		maxEval := -1000
+		for _, col := range moves {
+			// Simule le coup
+			row := g.simulateMove(col, 2)
+			if row == -1 {
+				continue
+			}
+
+			eval, _ := g.minimax(depth-1, false, alpha, beta)
+			g.Board[row][col] = 0 // Annule le coup
+
+			if eval > maxEval {
+				maxEval = eval
+				bestCol = col
+			}
+
+			alpha = max(alpha, eval)
+			if beta <= alpha {
+				break // Élagage alpha-beta
+			}
+		}
+		return maxEval, bestCol
+	} else {
+		minEval := 1000
+		for _, col := range moves {
+			// Simule le coup
+			row := g.simulateMove(col, 1)
+			if row == -1 {
+				continue
+			}
+
+			eval, _ := g.minimax(depth-1, true, alpha, beta)
+			g.Board[row][col] = 0 // Annule le coup
+
+			if eval < minEval {
+				minEval = eval
+				bestCol = col
+			}
+
+			beta = min(beta, eval)
+			if beta <= alpha {
+				break // Élagage alpha-beta
+			}
+		}
+		return minEval, bestCol
+	}
+}
+
+// simulateMove simule un coup sans vérifier les conditions de victoire
+func (g *Game) simulateMove(col, player int) int {
+	var row int
+	if g.Gravity == GravityDown {
+		for row = g.Rows - 1; row >= 0; row-- {
+			if g.Board[row][col] == 0 {
+				break
+			}
+		}
+	} else {
+		for row = 0; row < g.Rows; row++ {
+			if g.Board[row][col] == 0 {
+				break
+			}
+		}
+	}
+
+	if row < 0 || row >= g.Rows || g.Board[row][col] != 0 {
+		return -1
+	}
+
+	g.Board[row][col] = player
+	return row
+}
+
+// evaluateBoard évalue la position pour l'IA (joueur 2)
+func (g *Game) evaluateBoard() int {
+	score := 0
+
+	// Vérifie toutes les fenêtres de 4 cases
+	for r := 0; r < g.Rows; r++ {
+		for c := 0; c < g.Cols; c++ {
+			// Horizontal
+			if c+3 < g.Cols {
+				score += g.evaluateWindow(r, c, 0, 1)
+			}
+			// Vertical
+			if r+3 < g.Rows {
+				score += g.evaluateWindow(r, c, 1, 0)
+			}
+			// Diagonale descendante
+			if r+3 < g.Rows && c+3 < g.Cols {
+				score += g.evaluateWindow(r, c, 1, 1)
+			}
+			// Diagonale montante
+			if r+3 < g.Rows && c-3 >= 0 {
+				score += g.evaluateWindow(r, c, 1, -1)
+			}
+		}
+	}
+
+	return score
+}
+
+// evaluateWindow évalue une fenêtre de 4 cases
+func (g *Game) evaluateWindow(startR, startC, deltaR, deltaC int) int {
+	score := 0
+	aiCount := 0
+	humanCount := 0
+
+	for i := 0; i < 4; i++ {
+		r := startR + i*deltaR
+		c := startC + i*deltaC
+
+		if g.Board[r][c] == 2 {
+			aiCount++
+		} else if g.Board[r][c] == 1 {
+			humanCount++
+		}
+	}
+
+	// Ne peut pas être une ligne gagnante si les deux joueurs y ont des jetons
+	if aiCount > 0 && humanCount > 0 {
+		return 0
+	}
+
+	// Évaluation pour l'IA (joueur 2)
+	if aiCount == 4 {
+		score += 100
+	} else if aiCount == 3 {
+		score += 10
+	} else if aiCount == 2 {
+		score += 2
+	}
+
+	// Évaluation contre l'humain (joueur 1)
+	if humanCount == 4 {
+		score -= 100
+	} else if humanCount == 3 {
+		score -= 10
+	} else if humanCount == 2 {
+		score -= 2
+	}
+
+	return score
+}
+
+// Fonctions utilitaires pour min/max
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+// aiMove choisit le coup de l'IA selon son niveau
+func (g *Game) aiMove() int {
+	switch g.AILevel {
+	case AIEasy:
+		return g.aiEasyMove()
+	case AIMedium:
+		return g.aiMediumMove()
+	case AIHard:
+		return g.aiHardMove()
+	default:
+		return g.aiEasyMove()
+	}
+}
+
 // getWinningPositions retourne les positions des 4 jetons gagnants si victoire, sinon nil.
 func (g *Game) getWinningPositions() [][2]int {
 	player := g.Winner
@@ -199,6 +510,9 @@ func renderBoard(g *Game) template.HTML {
 	if g.CurrentPlayer == 2 {
 		playerClass = "p2"
 	}
+
+	// Désactive l'interface si c'est le tour de l'IA
+	disableInterface := g.GameMode == ModeHumanVsAI && g.CurrentPlayer == 2 && !g.GameOver
 	gravityArrow := "↓"
 	if g.Gravity == GravityUp {
 		gravityArrow = "↑"
@@ -228,7 +542,7 @@ func renderBoard(g *Game) template.HTML {
 	// Ligne de sélection alignée avec les colonnes, flèche directionnelle
 	html += "<tr>"
 	for c := 0; c < g.Cols; c++ {
-		if !g.GameOver {
+		if !g.GameOver && !disableInterface {
 			html += "<td style='padding:0; border:none; background:none; text-align:center;'>"
 			html += "<div class='selector-token' data-col='" + strconv.Itoa(c) + "' title='Jouer colonne " + strconv.Itoa(c+1) + "'>"
 			html += "<span class='selector-arrow'>" + gravityArrow + "</span>"
@@ -321,15 +635,28 @@ func modeHandler(w http.ResponseWriter, r *http.Request) {
 		mode := r.FormValue("mode")
 		username := r.FormValue("username")
 		difficulty := r.FormValue("difficulty")
-		http.Redirect(w, r, "/connect4?username="+username+"&difficulty="+difficulty+"&mode="+mode, http.StatusSeeOther)
+		gamemode := r.FormValue("gamemode")
+		ailevel := r.FormValue("ailevel")
+
+		url := "/connect4?username=" + username + "&difficulty=" + difficulty + "&mode=" + mode + "&gamemode=" + gamemode
+		if ailevel != "" {
+			url += "&ailevel=" + ailevel
+		}
+
+		http.Redirect(w, r, url, http.StatusSeeOther)
 		return
 	}
-	// On récupère username et difficulty pour les garder dans le formulaire
+	// On récupère tous les paramètres pour les garder dans le formulaire
 	username := r.URL.Query().Get("username")
 	difficulty := r.URL.Query().Get("difficulty")
+	gamemode := r.URL.Query().Get("gamemode")
+	ailevel := r.URL.Query().Get("ailevel")
+
 	modeTmpl.Execute(w, map[string]interface{}{
 		"Username":   username,
 		"Difficulty": difficulty,
+		"GameMode":   gamemode,
+		"AILevel":    ailevel,
 	})
 }
 
@@ -338,7 +665,15 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		username := r.FormValue("username")
 		difficulty := r.FormValue("difficulty")
-		http.Redirect(w, r, "/mode?username="+username+"&difficulty="+difficulty, http.StatusSeeOther)
+		gamemode := r.FormValue("gamemode")
+		ailevel := r.FormValue("ailevel")
+
+		url := "/mode?username=" + username + "&difficulty=" + difficulty + "&gamemode=" + gamemode
+		if ailevel != "" {
+			url += "&ailevel=" + ailevel
+		}
+
+		http.Redirect(w, r, url, http.StatusSeeOther)
 		return
 	}
 	startTmpl.Execute(w, nil)
@@ -351,8 +686,28 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
 	difficulty := r.URL.Query().Get("difficulty")
 	mode := r.URL.Query().Get("mode")
+	gamemodeStr := r.URL.Query().Get("gamemode")
+	ailevelStr := r.URL.Query().Get("ailevel")
+
 	if mode != "inverse" {
 		mode = "normal"
+	}
+
+	// Parse GameMode
+	var gameMode GameMode = ModeHumanVsHuman
+	if gamemodeStr == "ai" {
+		gameMode = ModeHumanVsAI
+	}
+
+	// Parse AILevel
+	var aiLevel AILevel = AIEasy
+	switch ailevelStr {
+	case "medium":
+		aiLevel = AIMedium
+	case "hard":
+		aiLevel = AIHard
+	default:
+		aiLevel = AIEasy
 	}
 
 	rows, cols, prefill := 6, 7, 0
@@ -365,8 +720,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		rows, cols, prefill = 8, 10, 7
 	}
 
-	if game == nil || (username != "" && (game.Username != username || game.Difficulty != difficulty || game.Mode != mode)) {
-		game = NewGame(rows, cols, prefill, difficulty, username, mode)
+	if game == nil || (username != "" && (game.Username != username || game.Difficulty != difficulty || game.Mode != mode || game.GameMode != gameMode || game.AILevel != aiLevel)) {
+		game = NewGame(rows, cols, prefill, difficulty, username, mode, gameMode, aiLevel)
 	}
 
 	if r.Method == "POST" {
@@ -377,11 +732,19 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if r.FormValue("rematch") == "1" {
-			game = NewGame(rows, cols, prefill, difficulty, username, mode)
+			game = NewGame(rows, cols, prefill, difficulty, username, mode, gameMode, aiLevel)
 		} else if colStr := r.FormValue("col"); colStr != "" {
 			col, err := strconv.Atoi(colStr)
 			if err == nil {
 				game.DropToken(col)
+
+				// Si c'est le mode IA et que c'est au tour de l'IA (joueur 2)
+				if game.GameMode == ModeHumanVsAI && game.CurrentPlayer == 2 && !game.GameOver {
+					aiCol := game.aiMove()
+					if aiCol >= 0 {
+						game.DropToken(aiCol)
+					}
+				}
 			}
 		}
 	}
@@ -392,7 +755,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		if game.Winner == 1 {
 			endMessage = "🎉 Victoire !"
 		} else if game.Winner == 2 {
-			endMessage = "💀 Défaite !"
+			if game.GameMode == ModeHumanVsAI {
+				endMessage = "🤖 L'IA a gagné !"
+			} else {
+				endMessage = "💀 Défaite !"
+			}
 		} else {
 			endMessage = "Match nul !"
 		}
@@ -409,6 +776,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		Rows          int
 		Cols          int
 		Mode          string
+		GameMode      GameMode
+		AILevel       AILevel
 		EndMessage    string
 	}{
 		BoardHTML:     renderBoard(game),
@@ -421,6 +790,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		Rows:          game.Rows,
 		Cols:          game.Cols,
 		Mode:          game.Mode,
+		GameMode:      game.GameMode,
+		AILevel:       game.AILevel,
 		EndMessage:    endMessage,
 	}
 	pageTmpl.Execute(w, data)

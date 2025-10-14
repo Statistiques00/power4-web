@@ -140,6 +140,21 @@
                     <option value="hard">Difficile (8x10)</option>
                 </select>
             </label>
+            <label>
+                Mode de jeu :
+                <select name="gamemode">
+                    <option value="human">Humain vs Humain</option>
+                    <option value="ai">Humain vs IA</option>
+                </select>
+            </label>
+            <label id="ai-level-label" style="display: none;">
+                Niveau de l'IA :
+                <select name="ailevel">
+                    <option value="easy">Facile</option>
+                    <option value="medium">Moyen</option>
+                    <option value="hard">Difficile</option>
+                </select>
+            </label>
             <button type="submit">Commencer</button>
         </form>
         <div class="difficulty-preview">
@@ -190,5 +205,23 @@
             </div>
         </div>
     </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const gamemodeSelect = document.querySelector('select[name="gamemode"]');
+            const aiLevelLabel = document.getElementById('ai-level-label');
+            
+            function toggleAILevel() {
+                if (gamemodeSelect.value === 'ai') {
+                    aiLevelLabel.style.display = 'flex';
+                } else {
+                    aiLevelLabel.style.display = 'none';
+                }
+            }
+            
+            gamemodeSelect.addEventListener('change', toggleAILevel);
+            toggleAILevel(); // Initial call
+        });
+    </script>
 </body>
 </html>
