@@ -102,8 +102,8 @@ func (g *Game) DropToken(col int) bool {
 	g.LastRow = row
 	g.LastCol = col
 	g.TurnCount++
-	// Gravity reversal every 5 turns
-	if g.TurnCount%5 == 0 {
+	// Gravity reversal every 5 turns - only in inverse mode
+	if g.Mode == "inverse" && g.TurnCount%5 == 0 {
 		if g.Gravity == GravityDown {
 			g.Gravity = GravityUp
 		} else {
@@ -286,11 +286,11 @@ func renderBoard(g *Game) template.HTML {
 
 // --- Template loading ---
 var (
-	pageTmpl      *template.Template
-	startTmpl     *template.Template
-	winTmpl       *template.Template
-	loseTmpl      *template.Template
-	modeTmpl      *template.Template
+	pageTmpl  *template.Template
+	startTmpl *template.Template
+	winTmpl   *template.Template
+	loseTmpl  *template.Template
+	modeTmpl  *template.Template
 )
 
 func loadTemplates() error {
@@ -358,9 +358,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	rows, cols, prefill := 6, 7, 0
 	switch difficulty {
 	case "easy":
-		rows, cols, prefill = 6, 7, 3
+		rows, cols, prefill = 6, 7, 0
 	case "normal":
-		rows, cols, prefill = 7, 8, 5
+		rows, cols, prefill = 7, 8, 0
 	case "hard":
 		rows, cols, prefill = 8, 10, 7
 	}
