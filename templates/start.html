@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Puissance 4 - Démarrer</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body {
+            background: #0d1b2a;
+            color: #ffeccc;
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+            margin: 0;
+            padding: 0;
+        }
+        .welcome-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding-top: 4vh;
+        }
+        .main-title {
+            font-family: 'Press Start 2P', 'Fira Mono', monospace;
+            font-size: 3em;
+            letter-spacing: 0.08em;
+            margin-bottom: 32px;
+            color: #ffeccc;
+            text-shadow: 0 0 2px #fff2, 0 0 8px #00d9ff22, 0 0 18px #00d9ff22;
+        }
+        .start-form {
+            background: rgba(30,58,92,0.93);
+            border-radius: 18px;
+            box-shadow: 0 4px 32px #0006;
+            padding: 36px 40px 28px 40px;
+            margin-bottom: 36px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 340px;
+        }
+        .start-form label {
+            font-size: 1.2em;
+            margin-bottom: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            color: #ffeccc;
+        }
+        .start-form input[type="text"], .start-form select {
+            font-size: 1.1em;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 2px solid #274472;
+            background: #16213e;
+            color: #ffeccc;
+            margin-top: 6px;
+            margin-bottom: 10px;
+            width: 220px;
+            font-family: inherit;
+            outline: none;
+            transition: border 0.15s;
+        }
+        .start-form input[type="text"]:focus, .start-form select:focus {
+            border-color: #ffe066;
+        }
+        .start-form button {
+            padding: 10px 32px;
+            font-size: 1.2em;
+            border-radius: 8px;
+            border: 2.5px solid #ffeccc;
+            background: #1e3a5c;
+            color: #ffeccc;
+            font-family: inherit;
+            cursor: pointer;
+            margin-top: 12px;
+            box-shadow: none;
+            transition: background 0.15s, color 0.15s, border 0.15s;
+        }
+        .start-form button:hover {
+            background: #ffe066;
+            color: #1e3a5c;
+            border-color: #ffe066;
+        }
+        .difficulty-preview {
+            display: flex;
+            gap: 3em;
+            margin: 2.5em 0 0 0;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .preview-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .preview-label {
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 0.5em;
+            letter-spacing: 0.04em;
+            color: #ffeccc;
+            font-family: 'Fira Mono', monospace;
+        }
+        .preview-board {
+            border: 2px solid #274472;
+            display: grid;
+            background: #1e3a5c;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #0004;
+        }
+        .preview-cell {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #ffeccc;
+            margin: 2px;
+            box-shadow: 0 1px 2px #0002;
+        }
+        @media (max-width: 900px) {
+            .difficulty-preview { gap: 1em; }
+            .main-title { font-size: 2em; }
+            .start-form { min-width: 220px; padding: 18px 8vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-container">
+        <div class="main-title">Bienvenue sur Puissance 4</div>
+        <form class="start-form" method="POST">
+            <label>
+                Nom d'utilisateur :
+                <input type="text" name="username" required autocomplete="off" maxlength="16">
+            </label>
+            <label>
+                Difficulté :
+                <select name="difficulty">
+                    <option value="easy">Facile (6x7)</option>
+                    <option value="normal">Normal (7x8)</option>
+                    <option value="hard">Difficile (8x10)</option>
+                </select>
+            </label>
+            <button type="submit">Commencer</button>
+        </form>
+        <div class="difficulty-preview">
+            <div class="preview-block">
+                <div class="preview-label">Facile</div>
+                <div class="preview-board" style="grid-template-columns: repeat(7, 18px); grid-template-rows: repeat(6, 18px);">
+                    <!-- 6x7 -->
+                    <!-- 42 cells -->
+                    <!-- prettier-ignore -->
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                </div>
+            </div>
+            <div class="preview-block">
+                <div class="preview-label">Normal</div>
+                <div class="preview-board" style="grid-template-columns: repeat(8, 18px); grid-template-rows: repeat(7, 18px);">
+                    <!-- 7x8 -->
+                    <!-- 56 cells -->
+                    <!-- prettier-ignore -->
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                </div>
+            </div>
+            <div class="preview-block">
+                <div class="preview-label">Difficile</div>
+                <div class="preview-board" style="grid-template-columns: repeat(10, 18px); grid-template-rows: repeat(8, 18px);">
+                    <!-- 8x10 -->
+                    <!-- 80 cells -->
+                    <!-- prettier-ignore -->
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

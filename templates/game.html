@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Puissance 4</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        body {
+            background: #0d1b2a;
+        }
+        .end-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(13,27,42,0.97); /* même fond que le body */
+            color: #ffeccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 2.5em;
+            letter-spacing: 0.06em;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s cubic-bezier(.4,2,.6,.9);
+        }
+        .end-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+            animation: dead-fadein 0.7s cubic-bezier(.4,2,.6,.9);
+        }
+        @keyframes dead-fadein {
+            0% { opacity: 0; transform: scale(1.15);}
+            100% { opacity: 1; transform: scale(1);}
+        }
+        .end-overlay .end-msg {
+            text-shadow: 0 0 8px #ffe066, 0 0 24px #c44536;
+            margin-bottom: 32px;
+            animation: end-pop 1.2s cubic-bezier(.4,2,.6,.9) infinite alternate;
+        }
+        @keyframes end-pop {
+            0% { transform: scale(1);}
+            100% { transform: scale(1.08);}
+        }
+        .end-overlay .end-btns {
+            margin-top: 24px;
+        }
+        .end-overlay button {
+            font-size: 1.1em;
+            padding: 12px 32px;
+            border-radius: 8px;
+            border: 2.5px solid #ffeccc;
+            background: #0d1b2a;
+            color: #ffeccc;
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+            cursor: pointer;
+            margin: 0 12px;
+            box-shadow: none;
+            transition: background 0.15s, color 0.15s, border 0.15s;
+        }
+        .end-overlay button:hover {
+            background: #ffe066;
+            color: #0d1b2a;
+            border-color: #ffe066;
+        }
+    </style>
+</head>
+<body>
+    <h2>Joueur : {{.Username}} | Difficulté : {{.Difficulty}} | Tour : {{.CurrentPlayer}}</h2>
+    {{.BoardHTML}}
+
+    {{if .EndMessage}}
+    <div id="endOverlay" class="end-overlay">
+        <div class="end-msg">{{.EndMessage}}</div>
+        <div class="end-btns">
+            <form method="POST" style="display:inline;">
+                <button name="rematch" value="1" type="submit">Revanche</button>
+            </form>
+            <form method="POST" style="display:inline;">
+                <button name="reset" value="1" type="submit">Nouvelle partie</button>
+            </form>
+        </div>
+    </div>
+    <script>
+    window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            document.getElementById('endOverlay').classList.add('visible');
+        }, 200);
+    });
+    </script>
+    {{end}}
+</body>
+</html>

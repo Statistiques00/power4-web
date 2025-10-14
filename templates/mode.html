@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Choix du mode de jeu</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .mode-choice { display: flex; gap: 2em; justify-content: center; margin-top: 40px; }
+        .mode-btn {
+            padding: 24px 40px;
+            font-size: 1.5em;
+            border-radius: 18px;
+            border: 3px solid #274472;
+            background: #0d1b2a;
+            color: #ffeccc;
+            font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+            cursor: pointer;
+            margin: 0 8px;
+            box-shadow: 0 2px 8px #0003;
+            transition: background 0.15s, color 0.15s, border 0.15s;
+        }
+        .mode-btn:hover, .mode-btn:focus {
+            background: #274472;
+            color: #ffe066;
+            border-color: #ffe066;
+        }
+        .mode-icon {
+            font-size: 2em;
+            display: block;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Choisissez le mode de jeu</h1>
+    <form method="POST">
+        <input type="hidden" name="username" value="{{.Username}}">
+        <input type="hidden" name="difficulty" value="{{.Difficulty}}">
+        <div class="mode-choice">
+            <button class="mode-btn" name="mode" value="normal" type="submit">
+                <span class="mode-icon">⬇️</span>
+                Normal<br>
+                <small>Gravité classique</small>
+            </button>
+            <button class="mode-btn" name="mode" value="inverse" type="submit">
+                <span class="mode-icon">⬆️</span>
+                Gravité inversée<br>
+                <small>Les pions montent !</small>
+            </button>
+        </div>
+    </form>
+</body>
+</html>
