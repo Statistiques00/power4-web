@@ -4,15 +4,65 @@
     <title>Puissance 4</title>
     <link rel="stylesheet" href="/style.css">
     <style>
-        body {
+        body.skin-classic {
             background: #0d1b2a;
+            color: #ffeccc;
+        }
+        body.skin-neon {
+            background: #0d0d0d;
+            color: #00ffcc;
+        }
+        body.skin-retro {
+            background: #3b2f2f;
+            color: #fbe8c6;
+        }
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .game-title {
+            font-family: 'Press Start 2P', 'Fira Mono', monospace;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 2px #fff2, 0 0 8px #00d9ff22, 0 0 18px #00d9ff22;
+        }
+        .game-board {
+            margin-top: 20px;
+        }
+        .controls {
+            margin-top: 20px;
+            transition: opacity 0.3s ease;
+        }
+        .controls.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .controls button {
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 8px;
+            border: 2px solid #ffeccc;
+            background: #1e3a5c;
+            color: inherit;
+            cursor: pointer;
+            transition: background 0.15s, color 0.15s, border 0.15s;
+        }
+        .controls button:hover {
+            background: #ffe066;
+            color: #1e3a5c;
+            border-color: #ffe066;
         }
         .end-overlay {
             position: fixed;
             top: 0; left: 0; right: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(13,27,42,0.97); /* même fond que le body */
+            background: rgba(13,27,42,0.97);
             color: #ffeccc;
             display: flex;
             flex-direction: column;
@@ -29,20 +79,10 @@
         .end-overlay.visible {
             opacity: 1;
             pointer-events: auto;
-            animation: dead-fadein 0.7s cubic-bezier(.4,2,.6,.9);
-        }
-        @keyframes dead-fadein {
-            0% { opacity: 0; transform: scale(1.15);}
-            100% { opacity: 1; transform: scale(1);}
         }
         .end-overlay .end-msg {
             text-shadow: 0 0 8px #ffe066, 0 0 24px #c44536;
             margin-bottom: 32px;
-            animation: end-pop 1.2s cubic-bezier(.4,2,.6,.9) infinite alternate;
-        }
-        @keyframes end-pop {
-            0% { transform: scale(1);}
-            100% { transform: scale(1.08);}
         }
         .end-overlay .end-btns {
             margin-top: 24px;
@@ -57,7 +97,6 @@
             font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
             cursor: pointer;
             margin: 0 12px;
-            box-shadow: none;
             transition: background 0.15s, color 0.15s, border 0.15s;
         }
         .end-overlay button:hover {
@@ -65,24 +104,38 @@
             color: #0d1b2a;
             border-color: #ffe066;
         }
+        @keyframes drop {
+            0% {
+                transform: translateY(-100px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .token-wrap.just-played {
+            animation: drop 0.4s ease-out;
+        }
     </style>
 </head>
-<body>
-    <h2>Joueur : {{.Username}} | Difficulté : {{.Difficulty}} 
-    {{if eq .GameMode 1}}| Mode : VS IA ({{if eq .AILevel 0}}Facile{{else if eq .AILevel 1}}Moyen{{else}}Difficile{{end}}){{end}}
-    </h2>
-    
-    {{if and (eq .GameMode 1) (eq .CurrentPlayer 2) (not .GameOver)}}
-    <div style="text-align: center; padding: 10px; background: rgba(255,230,102,0.1); margin: 10px; border-radius: 8px; color: #ffe066;">
-        🤖 L'IA réfléchit...
+<body class="skin-{{.Skin}}">
+    <div class="game-container">
+        <h1 class="game-title">Puissance 4</h1>
+        <h2>Joueur : {{.Username}} | Difficulté : {{.Difficulty}} 
+        {{if eq .GameMode 1}}| Mode : VS IA ({{if eq .AILevel 0}}Facile{{else if eq .AILevel 1}}Moyen{{else}}Difficile{{end}}){{end}}
+        </h2>
+        <div class="game-board">
+            {{.BoardHTML}}
+        </div>
+        <div class="controls" id="controls">
+            <form method="POST">
+                {{if .GameOver}}
+                    <button name="rematch" value="1">Revanche</button>
+                {{end}}
+            </form>
+        </div>
     </div>
-    {{else if not .GameOver}}
-    <div style="text-align: center; padding: 10px; margin: 10px; color: #ffeccc;">
-        {{if eq .CurrentPlayer 1}}🔴 À votre tour{{else}}🟡 Tour du Joueur 2{{end}}
-    </div>
-    {{end}}
-    
-    {{.BoardHTML}}
 
     {{if .EndMessage}}
     <div id="endOverlay" class="end-overlay">
@@ -98,8 +151,11 @@
     </div>
     <script>
     window.addEventListener('DOMContentLoaded', function() {
+        const endOverlay = document.getElementById('endOverlay');
+        const controls = document.getElementById('controls');
         setTimeout(function() {
-            document.getElementById('endOverlay').classList.add('visible');
+            endOverlay.classList.add('visible');
+            controls.classList.add('hidden'); // Cache les boutons de base
         }, 200);
     });
     </script>

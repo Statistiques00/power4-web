@@ -11,123 +11,169 @@
             margin: 0;
             padding: 0;
         }
-        .welcome-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            min-height: 100vh;
-            padding-top: 4vh;
-        }
-        .main-title {
-            font-family: 'Press Start 2P', 'Fira Mono', monospace;
-            font-size: 3em;
-            letter-spacing: 0.08em;
-            margin-bottom: 32px;
+        body.skin-classic {
+            background: #0d1b2a;
             color: #ffeccc;
-            text-shadow: 0 0 2px #fff2, 0 0 8px #00d9ff22, 0 0 18px #00d9ff22;
         }
-        .start-form {
-            background: rgba(30,58,92,0.93);
-            border-radius: 18px;
-            box-shadow: 0 4px 32px #0006;
-            padding: 36px 40px 28px 40px;
-            margin-bottom: 36px;
+        body.skin-neon {
+            background: #0d0d0d;
+            color: #00ffcc;
+        }
+        body.skin-retro {
+            background: #3b2f2f;
+            color: #fbe8c6;
+        }
+        .main-layout {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            gap: 4vw;
+            padding: 20px;
+        }
+        .form-panel, .preview-panel {
+            background: rgba(30,58,92,0.97);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px #0008;
+            padding: 48px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-width: 340px;
+            max-width: 400px;
         }
-        .start-form label {
-            font-size: 1.2em;
+        .form-panel h1 {
+            font-family: 'Press Start 2P', 'Fira Mono', monospace;
+            font-size: 2.2em;
+            letter-spacing: 0.08em;
+            margin-bottom: 38px;
+            color: inherit;
+            text-shadow: 0 0 2px #fff2, 0 0 8px #00d9ff22, 0 0 18px #00d9ff22;
+        }
+        .form-panel label {
+            font-size: 1.25em;
             margin-bottom: 18px;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
-            color: #ffeccc;
+            color: inherit;
+            font-family: 'Fira Mono', monospace;
         }
-        .start-form input[type="text"], .start-form select {
+        .form-panel input[type="text"], .form-panel select {
             font-size: 1.1em;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 10px 14px;
+            border-radius: 8px;
             border: 2px solid #274472;
             background: #16213e;
-            color: #ffeccc;
-            margin-top: 6px;
+            color: inherit;
+            margin-top: 8px;
             margin-bottom: 10px;
-            width: 220px;
+            width: 100%;
             font-family: inherit;
             outline: none;
             transition: border 0.15s;
         }
-        .start-form input[type="text"]:focus, .start-form select:focus {
+        .form-panel input[type="text"]:focus, .form-panel select:focus {
             border-color: #ffe066;
         }
-        .start-form button {
-            padding: 10px 32px;
-            font-size: 1.2em;
-            border-radius: 8px;
+        .form-panel button {
+            padding: 12px 38px;
+            font-size: 1.25em;
+            border-radius: 10px;
             border: 2.5px solid #ffeccc;
             background: #1e3a5c;
-            color: #ffeccc;
+            color: inherit;
             font-family: inherit;
             cursor: pointer;
-            margin-top: 12px;
-            box-shadow: none;
+            margin-top: 24px;
+            box-shadow: 0 2px 8px #0003;
             transition: background 0.15s, color 0.15s, border 0.15s;
         }
-        .start-form button:hover {
+        .form-panel button:hover {
             background: #ffe066;
             color: #1e3a5c;
             border-color: #ffe066;
         }
-        .difficulty-preview {
-            display: flex;
-            gap: 3em;
-            margin: 2.5em 0 0 0;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        .preview-block {
+        .preview-panel {
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
         }
-        .preview-label {
-            text-align: center;
+        .preview-title {
+            font-family: 'Press Start 2P', 'Fira Mono', monospace;
+            font-size: 1.3em;
             font-weight: bold;
-            font-size: 1.2em;
-            margin-bottom: 0.5em;
+            margin-bottom: 18px;
+            color: inherit;
+            text-align: center;
             letter-spacing: 0.04em;
-            color: #ffeccc;
-            font-family: 'Fira Mono', monospace;
         }
-        .preview-board {
-            border: 2px solid #274472;
+        .skin-preview-board {
             display: grid;
-            background: #1e3a5c;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px #0004;
+            grid-template-columns: repeat(7, 60px);
+            grid-template-rows: repeat(6, 60px);
+            gap: 8px;
+            border-radius: 16px;
+            padding: 12px;
+            box-shadow: 0 6px 20px #0008;
+            margin-top: 8px;
         }
-        .preview-cell {
-            width: 18px;
-            height: 18px;
+        .skin-preview-board.classic {
+            background: #1e3a5c;
+            border: 2px solid #274472;
+        }
+        .skin-preview-board.neon {
+            background: #0d0d0d;
+            border: 2px solid #00ffcc;
+        }
+        .skin-preview-board.retro {
+            background: #3b2f2f;
+            border: 2px solid #d9534f;
+        }
+        .skin-preview-cell {
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            background: #ffeccc;
-            margin: 2px;
-            box-shadow: 0 1px 2px #0002;
+            margin: 0;
+            box-shadow: 0 2px 4px #0004;
+        }
+        .skin-preview-cell.red {
+            background: #c44536;
+        }
+        .skin-preview-cell.yellow {
+            background: #ffe066;
+        }
+        .skin-preview-board.neon .skin-preview-cell.red {
+            background: #ff0066;
+        }
+        .skin-preview-board.neon .skin-preview-cell.yellow {
+            background: #ffcc00;
+        }
+        .skin-preview-board.retro .skin-preview-cell.red {
+            background: #d9534f;
+        }
+        .skin-preview-board.retro .skin-preview-cell.yellow {
+            background: #f0ad4e;
         }
         @media (max-width: 900px) {
-            .difficulty-preview { gap: 1em; }
-            .main-title { font-size: 2em; }
-            .start-form { min-width: 220px; padding: 18px 8vw; }
+            .main-layout {
+                flex-direction: column;
+                gap: 2vw;
+                padding: 20px;
+            }
+            .form-panel, .preview-panel {
+                margin: 0 auto;
+                width: 100%;
+                max-width: 400px;
+            }
         }
     </style>
 </head>
-<body>
-    <div class="welcome-container">
-        <div class="main-title">Bienvenue sur Puissance 4</div>
-        <form class="start-form" method="POST">
+<body class="skin-classic">
+    <div class="main-layout">
+        <form class="form-panel" method="POST">
+            <h1>Bienvenue sur Puissance 4</h1>
             <label>
                 Nom d'utilisateur :
                 <input type="text" name="username" required autocomplete="off" maxlength="16">
@@ -142,12 +188,20 @@
             </label>
             <label>
                 Mode de jeu :
-                <select name="gamemode">
-                    <option value="human">Humain vs Humain</option>
-                    <option value="ai">Humain vs IA</option>
+                <select name="gamemode" id="gamemode-select">
+                    <option value="human">Joueur vs Joueur</option>
+                    <option value="ai">Joueur vs IA</option>
                 </select>
             </label>
-            <label id="ai-level-label" style="display: none;">
+            <label>
+                Skin :
+                <select name="skin" id="skin-select">
+                    <option value="classic">Classique</option>
+                    <option value="neon">Néon</option>
+                    <option value="retro">Rétro</option>
+                </select>
+            </label>
+            <label id="ai-level-label" style="display:none;">
                 Niveau de l'IA :
                 <select name="ailevel">
                     <option value="easy">Facile</option>
@@ -155,62 +209,77 @@
                     <option value="hard">Difficile</option>
                 </select>
             </label>
-            <button type="submit">Commencer</button>
+            <div style="width:100%;display:flex;justify-content:center;">
+                <button type="submit">Commencer</button>
+            </div>
         </form>
-        <div class="difficulty-preview">
-            <div class="preview-block">
-                <div class="preview-label">Facile</div>
-                <div class="preview-board" style="grid-template-columns: repeat(7, 18px); grid-template-rows: repeat(6, 18px);">
-                    <!-- 6x7 -->
-                    <!-- 42 cells -->
-                    <!-- prettier-ignore -->
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                </div>
-            </div>
-            <div class="preview-block">
-                <div class="preview-label">Normal</div>
-                <div class="preview-board" style="grid-template-columns: repeat(8, 18px); grid-template-rows: repeat(7, 18px);">
-                    <!-- 7x8 -->
-                    <!-- 56 cells -->
-                    <!-- prettier-ignore -->
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                </div>
-            </div>
-            <div class="preview-block">
-                <div class="preview-label">Difficile</div>
-                <div class="preview-board" style="grid-template-columns: repeat(10, 18px); grid-template-rows: repeat(8, 18px);">
-                    <!-- 8x10 -->
-                    <!-- 80 cells -->
-                    <!-- prettier-ignore -->
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                    <div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div><div class="preview-cell"></div>
-                </div>
+        <div class="preview-panel">
+            <div class="preview-title">Prévisualisation du Skin</div>
+            <div class="skin-preview-board classic" id="skin-preview">
+                <!-- Preview cells -->
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
+                <div class="skin-preview-cell red"></div>
+                <div class="skin-preview-cell yellow"></div>
             </div>
         </div>
     </div>
-    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const gamemodeSelect = document.querySelector('select[name="gamemode"]');
+            const skinSelect = document.getElementById('skin-select');
+            const skinPreview = document.getElementById('skin-preview');
+            const body = document.body;
+            const gamemodeSelect = document.getElementById('gamemode-select');
             const aiLevelLabel = document.getElementById('ai-level-label');
-            
+
+            skinSelect.addEventListener('change', function() {
+                const selectedSkin = skinSelect.value;
+                skinPreview.className = 'skin-preview-board ' + selectedSkin;
+                body.className = 'skin-' + selectedSkin;
+            });
+
             function toggleAILevel() {
                 if (gamemodeSelect.value === 'ai') {
                     aiLevelLabel.style.display = 'flex';
@@ -218,9 +287,8 @@
                     aiLevelLabel.style.display = 'none';
                 }
             }
-            
             gamemodeSelect.addEventListener('change', toggleAILevel);
-            toggleAILevel(); // Initial call
+            toggleAILevel();
         });
     </script>
 </body>

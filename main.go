@@ -48,6 +48,7 @@ type Game struct {
 	Mode          string // "normal" ou "inverse"
 	GameMode      GameMode
 	AILevel       AILevel
+	Skin          string // Nom du skin sélectionné
 }
 
 var (
@@ -55,7 +56,7 @@ var (
 	mutex sync.Mutex
 )
 
-func NewGame(rows, cols, prefill int, difficulty, username, mode string, gameMode GameMode, aiLevel AILevel) *Game {
+func NewGame(rows, cols, prefill int, difficulty, username, mode, skin string, gameMode GameMode, aiLevel AILevel) *Game {
 	board := make([][]int, rows)
 	for i := range board {
 		board[i] = make([]int, cols)
@@ -93,6 +94,7 @@ func NewGame(rows, cols, prefill int, difficulty, username, mode string, gameMod
 		Mode:          mode,
 		GameMode:      gameMode,
 		AILevel:       aiLevel,
+		Skin:          skin,
 	}
 }
 
@@ -635,10 +637,11 @@ func modeHandler(w http.ResponseWriter, r *http.Request) {
 		mode := r.FormValue("mode")
 		username := r.FormValue("username")
 		difficulty := r.FormValue("difficulty")
+		skin := r.FormValue("skin") // Ajout du skin
 		gamemode := r.FormValue("gamemode")
 		ailevel := r.FormValue("ailevel")
 
-		url := "/connect4?username=" + username + "&difficulty=" + difficulty + "&mode=" + mode + "&gamemode=" + gamemode
+		url := "/connect4?username=" + username + "&difficulty=" + difficulty + "&mode=" + mode + "&skin=" + skin + "&gamemode=" + gamemode
 		if ailevel != "" {
 			url += "&ailevel=" + ailevel
 		}
@@ -649,12 +652,14 @@ func modeHandler(w http.ResponseWriter, r *http.Request) {
 	// On récupère tous les paramètres pour les garder dans le formulaire
 	username := r.URL.Query().Get("username")
 	difficulty := r.URL.Query().Get("difficulty")
+	skin := r.URL.Query().Get("skin") // Ajout du skin
 	gamemode := r.URL.Query().Get("gamemode")
 	ailevel := r.URL.Query().Get("ailevel")
 
 	modeTmpl.Execute(w, map[string]interface{}{
 		"Username":   username,
 		"Difficulty": difficulty,
+		"Skin":       skin, // Ajout du skin
 		"GameMode":   gamemode,
 		"AILevel":    ailevel,
 	})
@@ -665,10 +670,11 @@ func startHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		username := r.FormValue("username")
 		difficulty := r.FormValue("difficulty")
+		skin := r.FormValue("skin")
 		gamemode := r.FormValue("gamemode")
 		ailevel := r.FormValue("ailevel")
 
-		url := "/mode?username=" + username + "&difficulty=" + difficulty + "&gamemode=" + gamemode
+		url := "/mode?username=" + username + "&difficulty=" + difficulty + "&skin=" + skin + "&gamemode=" + gamemode
 		if ailevel != "" {
 			url += "&ailevel=" + ailevel
 		}
@@ -686,6 +692,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
 	difficulty := r.URL.Query().Get("difficulty")
 	mode := r.URL.Query().Get("mode")
+	skin := r.URL.Query().Get("skin") // Ajout du skin
 	gamemodeStr := r.URL.Query().Get("gamemode")
 	ailevelStr := r.URL.Query().Get("ailevel")
 
@@ -720,8 +727,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		rows, cols, prefill = 8, 10, 7
 	}
 
-	if game == nil || (username != "" && (game.Username != username || game.Difficulty != difficulty || game.Mode != mode || game.GameMode != gameMode || game.AILevel != aiLevel)) {
-		game = NewGame(rows, cols, prefill, difficulty, username, mode, gameMode, aiLevel)
+	if game == nil || (username != "" && (game.Username != username || game.Difficulty != difficulty || game.Mode != mode || game.GameMode != gameMode || game.AILevel != aiLevel || game.Skin != skin)) {
+		game = NewGame(rows, cols, prefill, difficulty, username, mode, skin, gameMode, aiLevel)
 	}
 
 	if r.Method == "POST" {
@@ -732,7 +739,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if r.FormValue("rematch") == "1" {
-			game = NewGame(rows, cols, prefill, difficulty, username, mode, gameMode, aiLevel)
+			game = NewGame(rows, cols, prefill, difficulty, username, mode, skin, gameMode, aiLevel)
 		} else if colStr := r.FormValue("col"); colStr != "" {
 			col, err := strconv.Atoi(colStr)
 			if err == nil {
@@ -778,6 +785,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		Mode          string
 		GameMode      GameMode
 		AILevel       AILevel
+		Skin          string
 		EndMessage    string
 	}{
 		BoardHTML:     renderBoard(game),
@@ -792,6 +800,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		Mode:          game.Mode,
 		GameMode:      game.GameMode,
 		AILevel:       game.AILevel,
+		Skin:          game.Skin,
 		EndMessage:    endMessage,
 	}
 	pageTmpl.Execute(w, data)
