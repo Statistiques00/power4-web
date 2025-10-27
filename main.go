@@ -600,6 +600,14 @@ func renderBoard(g *Game) template.HTML {
 	});
 	</script>`
 
+	// Si c'est au tour de l'IA en mode Humain vs IA, on lance un fetch vers /ai-move après un délai
+	if g.GameMode == ModeHumanVsAI && g.CurrentPlayer == 2 && !g.GameOver {
+		// expose le délai en ms via data attribute et lance le fetch après le délai
+		html += "<script>" +
+		"(function(){ var delay=" + strconv.Itoa(aiDelayMs) + "; setTimeout(function(){ fetch('/ai-move', {method: 'POST'}).then(function(){ window.location.reload(); }); }, delay); })();" +
+		"</script>"
+	}
+
 	return template.HTML(html)
 }
 
@@ -815,9 +823,35 @@ func main() {
 	}
 	http.HandleFunc("/", startHandler)
 	http.HandleFunc("/mode", modeHandler)
+	http.HandleFunc("/ai-move", aiMoveHandler)
 	http.HandleFunc("/connect4", handler)
 	http.Handle("/style.css", http.FileServer(http.Dir(".")))
 	http.Handle("/favicon.svg", http.FileServer(http.Dir(".")))
 	fmt.Println("Serveur Puissance 4 Go sur http://localhost:8080/")
 	http.ListenAndServe(":8080", nil)
+}
+
+// aiMoveHandler effectue le coup de l'IA lorsqu'il est appelé (endpoint POST)
+func aiMoveHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+		return
+	}
+
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	if game == nil || game.GameMode != ModeHumanVsAI || game.GameOver || game.CurrentPlayer != 2 {
+		// Rien à faire
+		w.WriteHeader(http.StatusNoContent)
+		return
+	}
+
+	aiCol := game.aiMove()
+	if aiCol >= 0 {
+		game.DropToken(aiCol)
+	}
+
+	// OK
+	w.WriteHeader(http.StatusOK)
 }
