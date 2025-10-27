@@ -56,6 +56,9 @@ var (
 	mutex sync.Mutex
 )
 
+// Durée du délai en millisecondes entre le coup du joueur et celui de l'IA
+var aiDelayMs = 1000
+
 func NewGame(rows, cols, prefill int, difficulty, username, mode, skin string, gameMode GameMode, aiLevel AILevel) *Game {
 	board := make([][]int, rows)
 	for i := range board {
