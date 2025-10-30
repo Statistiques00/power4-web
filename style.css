@@ -24,6 +24,8 @@ body {
     --token-border: 3.5px;
     --board-gap: 14px;
     --selector-gap: 8px; /* distance between selector and top row */
+    --board-radius: 18px;
+    --board-border: 3px;
 }
 
 /* Titre principal */
@@ -45,6 +47,11 @@ h1 {
     background: #0d1b2a;
     margin: auto;
     table-layout: fixed;
+    border-radius: var(--board-radius); /* arrondit les angles du plateau */
+    overflow: hidden; /* aide certains navigateurs à clipper les coins arrondis */
+    border: var(--board-border) solid transparent; /* couleur définie par skin */
+    box-shadow: inset 0 8px 14px rgba(0,0,0,0.25), inset 0 -6px 10px rgba(0,0,0,0.18);
+    position: relative; /* pour effets supplémentaires si besoin */
 }
 
 /* Wrapper to allow absolute positioning of selector over the board */
@@ -54,6 +61,9 @@ h1 {
     margin-top: 8px; /* smaller extra space for selector */
     max-width: 100vw;
     overflow-x: auto;
+    border-radius: 16px; /* arrondit aussi l'enveloppe pour un rendu garanti */
+    overflow: hidden; /* clippe les coins même si le tableau déborde */
+    box-shadow: 0 12px 28px rgba(0,0,0,0.35), 0 2px 6px rgba(0,0,0,0.25);
 }
 
 /* Cases du plateau */
@@ -295,13 +305,8 @@ h1 {
 }
 
 /* Skins */
-.skin-classic .board {
-    background: #1e3a5c;
-}
-.skin-neon .board {
-    background: #0d0d0d;
-    border: 2px solid #00ffcc;
-}
+.skin-classic .board { background: #1e3a5c; border-color: #274472; }
+.skin-neon .board { background: #0d0d0d; border-color: #00ffcc; box-shadow: 0 0 0 2px rgba(0,255,204,0.25) inset, inset 0 8px 14px rgba(0,0,0,0.35); }
 .skin-neon .token.red {
     background: #ff0066;
     border-color: #ff99cc;
@@ -310,9 +315,7 @@ h1 {
     background: #ffcc00;
     border-color: #ffff99;
 }
-.skin-retro .board {
-    background: #3b2f2f;
-}
+.skin-retro .board { background: #3b2f2f; border-color: #9e4b47; }
 .skin-retro .token.red {
     background: #d9534f;
     border-color: #f7c6c6;

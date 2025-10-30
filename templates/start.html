@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Puissance 4 - Démarrer</title>
-    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/style.css?v=3">
     <style>
         body {
             background: #0d1b2a;
@@ -100,6 +100,47 @@
             align-items: center;
             justify-content: center;
         }
+        /* Skin chooser cards */
+        .skin-chooser { width: 100%; }
+        .skins-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            width: 100%;
+        }
+        .skin-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 10px;
+            border-radius: 12px;
+            border: 2px solid #274472;
+            background: #14233a;
+            cursor: pointer;
+            transition: transform .15s, box-shadow .15s, border-color .15s, background .15s;
+            user-select: none;
+        }
+        .skin-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px #0005; border-color: #ffe066; }
+        .skin-card.selected { border-color: #ffe066; box-shadow: 0 6px 16px #0006; background: #1a2d4a; }
+        .skin-card input { position: absolute; opacity: 0; pointer-events: none; }
+        .skin-thumb {
+            width: 100%; height: 56px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: space-around;
+            margin-bottom: 8px; padding: 6px;
+        }
+        .skin-thumb.classic { background: #1e3a5c; border: 2px solid #274472; }
+        .skin-thumb.neon    { background: #0d0d0d; border: 2px solid #00ffcc; }
+        .skin-thumb.retro   { background: #3b2f2f; border: 2px solid #d9534f; }
+        .skin-thumb .disc { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #ffeccc; box-shadow: 0 1px 2px #0006; }
+        .skin-thumb.classic .disc.red { background:#c44536; }
+        .skin-thumb.classic .disc.yellow { background:#ffe066; }
+        .skin-thumb.neon .disc.red { background:#ff0066; border-color:#ff99cc; }
+        .skin-thumb.neon .disc.yellow { background:#ffcc00; border-color:#ffff99; }
+        .skin-thumb.retro .disc.red { background:#d9534f; border-color:#f7c6c6; }
+        .skin-thumb.retro .disc.yellow { background:#f0ad4e; border-color:#fbe8c6; }
+        .skin-name { font-size: 0.95em; opacity: 0.95; }
         .preview-title {
             font-family: 'Press Start 2P', 'Fira Mono', monospace;
             font-size: 1.3em;
@@ -193,14 +234,38 @@
                     <option value="ai">Joueur vs IA</option>
                 </select>
             </label>
-            <label>
-                Skin :
-                <select name="skin" id="skin-select">
-                    <option value="classic">Classique</option>
-                    <option value="neon">Néon</option>
-                    <option value="retro">Rétro</option>
-                </select>
-            </label>
+            <div class="skin-chooser">
+                <div style="margin-bottom:12px; font-size:1.25em; text-align:left; width:100%;">Skin :</div>
+                <div class="skins-grid">
+                    <label class="skin-card selected" data-skin="classic" title="Classique">
+                        <input type="radio" name="skin" value="classic" checked>
+                        <div class="skin-thumb classic">
+                            <span class="disc red"></span>
+                            <span class="disc yellow"></span>
+                            <span class="disc red"></span>
+                        </div>
+                        <div class="skin-name">Classique</div>
+                    </label>
+                    <label class="skin-card" data-skin="neon" title="Néon">
+                        <input type="radio" name="skin" value="neon">
+                        <div class="skin-thumb neon">
+                            <span class="disc red"></span>
+                            <span class="disc yellow"></span>
+                            <span class="disc red"></span>
+                        </div>
+                        <div class="skin-name">Néon</div>
+                    </label>
+                    <label class="skin-card" data-skin="retro" title="Rétro">
+                        <input type="radio" name="skin" value="retro">
+                        <div class="skin-thumb retro">
+                            <span class="disc red"></span>
+                            <span class="disc yellow"></span>
+                            <span class="disc red"></span>
+                        </div>
+                        <div class="skin-name">Rétro</div>
+                    </label>
+                </div>
+            </div>
             <label id="ai-level-label" style="display:none;">
                 Niveau de l'IA :
                 <select name="ailevel">
@@ -268,17 +333,28 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const skinSelect = document.getElementById('skin-select');
             const skinPreview = document.getElementById('skin-preview');
             const body = document.body;
+            const skinCards = Array.from(document.querySelectorAll('.skin-card'));
             const gamemodeSelect = document.getElementById('gamemode-select');
             const aiLevelLabel = document.getElementById('ai-level-label');
-
-            skinSelect.addEventListener('change', function() {
-                const selectedSkin = skinSelect.value;
-                skinPreview.className = 'skin-preview-board ' + selectedSkin;
-                body.className = 'skin-' + selectedSkin;
+            function applySkin(skin) {
+                skinPreview.className = 'skin-preview-board ' + skin;
+                body.className = 'skin-' + skin;
+                skinCards.forEach(c => c.classList.toggle('selected', c.dataset.skin === skin));
+            }
+            skinCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const input = card.querySelector('input[type="radio"]');
+                    input.checked = true;
+                    applySkin(input.value);
+                });
+                const input = card.querySelector('input[type="radio"]');
+                input.addEventListener('change', () => applySkin(input.value));
             });
+            // init with checked value
+            const checked = document.querySelector('.skin-card input[type="radio"]:checked');
+            if (checked) applySkin(checked.value);
 
             function toggleAILevel() {
                 if (gamemodeSelect.value === 'ai') {

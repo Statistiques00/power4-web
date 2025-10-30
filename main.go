@@ -509,7 +509,8 @@ func (g *Game) getWinningPositions() [][2]int {
 	return nil
 }
 
-// renderBoard génère le HTML du plateau et des boutons de jeu selon l'état de la partie.
+// renderBoard génère le HTML du plateau et permet la sélection de colonne par clic sur la flèche au-dessus de chaque colonne.
+// Les boutons de colonne ont été remplacés par cette interaction directe, plus intuitive.
 func renderBoard(g *Game) template.HTML {
 	playerClass := "p1"
 	if g.CurrentPlayer == 2 {
@@ -518,10 +519,7 @@ func renderBoard(g *Game) template.HTML {
 
 	// Désactive l'interface si c'est le tour de l'IA
 	disableInterface := g.GameMode == ModeHumanVsAI && g.CurrentPlayer == 2 && !g.GameOver
-	gravityArrow := "↓"
-	if g.Gravity == GravityUp {
-		gravityArrow = "↑"
-	}
+	// Plus de flèches directionnelles: clic direct sur la colonne
 	winning := map[[2]int]bool{}
 	if g.GameOver && g.Winner != 0 {
 		for _, pos := range g.getWinningPositions() {
@@ -544,19 +542,7 @@ func renderBoard(g *Game) template.HTML {
 	}
 	html += " data-current='" + strconv.Itoa(g.CurrentPlayer) + "' style='margin:auto;'>\n"
 
-	// Ligne de sélection alignée avec les colonnes, flèche directionnelle
-	html += "<tr>"
-	for c := 0; c < g.Cols; c++ {
-		if !g.GameOver && !disableInterface {
-			html += "<td style='padding:0; border:none; background:none; text-align:center;'>"
-			html += "<div class='selector-token' data-col='" + strconv.Itoa(c) + "' title='Jouer colonne " + strconv.Itoa(c+1) + "'>"
-			html += "<span class='selector-arrow'>" + gravityArrow + "</span>"
-			html += "</div></td>"
-		} else {
-			html += "<td style='padding:0; border:none; background:none; text-align:center;'><div class='selector-token disabled'><span class='selector-arrow'>" + gravityArrow + "</span></div></td>"
-		}
-	}
-	html += "</tr>"
+	// Suppression de la ligne de sélection: on clique désormais directement sur une colonne du plateau
 
 	// Plateau de jeu
 	for r := 0; r < g.Rows; r++ {
@@ -582,7 +568,6 @@ func renderBoard(g *Game) template.HTML {
 		html += "</tr>"
 	}
 	html += "</table>\n"
-	html += "<div id='selector' class='selector' style='display:none'></div>\n"
 	html += "</div>" // end board-wrap
 	html += "<div class='controls'><button name='reset' value='1'>Nouvelle partie</button>"
 	if g.GameOver {
@@ -590,15 +575,30 @@ func renderBoard(g *Game) template.HTML {
 	}
 	html += "</div></form>"
 
-	// JS pour gérer le clic sur les "jetons" de sélection
-	html += `<script>
-	document.querySelectorAll('.selector-token:not(.disabled)').forEach(function(div) {
-		div.addEventListener('click', function() {
-			document.getElementById('col-input').value = div.getAttribute('data-col');
-			document.getElementById('board-form').submit();
-		});
-	});
-	</script>`
+	// JS pour gérer le clic directement sur une colonne du plateau et la surbrillance au survol
+	if !g.GameOver && !disableInterface {
+		html += `<script>
+		(function(){
+			var form = document.getElementById('board-form');
+			var colInput = document.getElementById('col-input');
+			function setColHighlight(col, on){
+				document.querySelectorAll('#board td[data-col="' + col + '"]').forEach(function(td){
+					if(on){ td.classList.add('col-selected'); } else { td.classList.remove('col-selected'); }
+				});
+			}
+			document.querySelectorAll('#board td').forEach(function(td){
+				var col = td.getAttribute('data-col');
+				if(col === null) return;
+				td.addEventListener('mouseenter', function(){ setColHighlight(col, true); });
+				td.addEventListener('mouseleave', function(){ setColHighlight(col, false); });
+				td.addEventListener('click', function(){
+					colInput.value = col;
+					form.submit();
+				});
+			});
+		})();
+		</script>`
+	}
 
 	// Si c'est au tour de l'IA en mode Humain vs IA, on lance un fetch vers /ai-move après un délai
 	if g.GameMode == ModeHumanVsAI && g.CurrentPlayer == 2 && !g.GameOver {
@@ -825,7 +825,13 @@ func main() {
 	http.HandleFunc("/mode", modeHandler)
 	http.HandleFunc("/ai-move", aiMoveHandler)
 	http.HandleFunc("/connect4", handler)
-	http.Handle("/style.css", http.FileServer(http.Dir(".")))
+	// Servez le CSS avec des en-têtes no-cache pour éviter les problèmes de cache navigateur
+	http.HandleFunc("/style.css", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate")
+		w.Header().Set("Pragma", "no-cache")
+		w.Header().Set("Expires", "0")
+		http.ServeFile(w, r, "style.css")
+	})
 	http.Handle("/favicon.svg", http.FileServer(http.Dir(".")))
 	fmt.Println("Serveur Puissance 4 Go sur http://localhost:8080/")
 	http.ListenAndServe(":8080", nil)
