@@ -215,9 +215,13 @@
     <div class="main-layout">
         <form class="form-panel" method="POST">
             <h1>Bienvenue sur Puissance 4</h1>
-            <label>
-                Nom d'utilisateur :
-                <input type="text" name="username" required autocomplete="off" maxlength="16">
+            <label id="username1-label">
+                <span id="username1-text">Nom du joueur 1 :</span>
+                <input id="username-input" type="text" name="username" required autocomplete="off" maxlength="16" placeholder="Joueur 1">
+            </label>
+            <label id="username2-label" style="display:none;">
+                Nom du joueur 2 :
+                <input type="text" name="username2" autocomplete="off" maxlength="16" placeholder="Joueur 2">
             </label>
             <label>
                 Difficulté :
@@ -232,6 +236,14 @@
                 <select name="gamemode" id="gamemode-select">
                     <option value="human">Joueur vs Joueur</option>
                     <option value="ai">Joueur vs IA</option>
+                </select>
+            </label>
+            <label id="ai-level-label" style="display:none;">
+                Niveau de l'IA :
+                <select name="ailevel">
+                    <option value="easy">Facile</option>
+                    <option value="medium">Moyen</option>
+                    <option value="hard">Difficile</option>
                 </select>
             </label>
             <div class="skin-chooser">
@@ -266,14 +278,7 @@
                     </label>
                 </div>
             </div>
-            <label id="ai-level-label" style="display:none;">
-                Niveau de l'IA :
-                <select name="ailevel">
-                    <option value="easy">Facile</option>
-                    <option value="medium">Moyen</option>
-                    <option value="hard">Difficile</option>
-                </select>
-            </label>
+            
             <div style="width:100%;display:flex;justify-content:center;">
                 <button type="submit">Commencer</button>
             </div>
@@ -338,6 +343,9 @@
             const skinCards = Array.from(document.querySelectorAll('.skin-card'));
             const gamemodeSelect = document.getElementById('gamemode-select');
             const aiLevelLabel = document.getElementById('ai-level-label');
+            const username2Label = document.getElementById('username2-label');
+            const username1Text = document.getElementById('username1-text');
+            const usernameInput = document.getElementById('username-input');
             function applySkin(skin) {
                 skinPreview.className = 'skin-preview-board ' + skin;
                 body.className = 'skin-' + skin;
@@ -356,15 +364,21 @@
             const checked = document.querySelector('.skin-card input[type="radio"]:checked');
             if (checked) applySkin(checked.value);
 
-            function toggleAILevel() {
-                if (gamemodeSelect.value === 'ai') {
-                    aiLevelLabel.style.display = 'flex';
+            function toggleByMode() {
+                const isAI = gamemodeSelect.value === 'ai';
+                aiLevelLabel.style.display = isAI ? 'flex' : 'none';
+                username2Label.style.display = isAI ? 'none' : 'flex';
+                // Mettre à jour le libellé et le placeholder du joueur 1 selon le mode
+                if (isAI) {
+                    username1Text.textContent = 'Nom du joueur :';
+                    if (usernameInput.placeholder === 'Joueur 1') usernameInput.placeholder = 'Votre pseudo';
                 } else {
-                    aiLevelLabel.style.display = 'none';
+                    username1Text.textContent = 'Nom du joueur 1 :';
+                    if (usernameInput.placeholder === 'Votre pseudo') usernameInput.placeholder = 'Joueur 1';
                 }
             }
-            gamemodeSelect.addEventListener('change', toggleAILevel);
-            toggleAILevel();
+            gamemodeSelect.addEventListener('change', toggleByMode);
+            toggleByMode();
         });
     </script>
 </body>

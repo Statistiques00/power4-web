@@ -122,8 +122,12 @@
 <body class="skin-{{.Skin}}">
     <div class="game-container">
         <h1 class="game-title">Puissance 4</h1>
-        <h2>Joueur : {{.Username}} | Difficulté : {{.Difficulty}} 
-        {{if eq .GameMode 1}}| Mode : VS IA ({{if eq .AILevel 0}}Facile{{else if eq .AILevel 1}}Moyen{{else}}Difficile{{end}}){{end}}
+        <h2>
+        {{if eq .GameMode 0}}
+            Joueur 1 : {{.Username1}} | Joueur 2 : {{.Username2}} | Difficulté : {{.Difficulty}}
+        {{else}}
+            Joueur : {{.Username1}} | Difficulté : {{.Difficulty}} | Mode : VS IA ({{if eq .AILevel 0}}Facile{{else if eq .AILevel 1}}Moyen{{else}}Difficile{{end}})
+        {{end}}
         </h2>
         <div class="game-board">
             {{.BoardHTML}}

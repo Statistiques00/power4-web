@@ -44,7 +44,9 @@ type Game struct {
 	TurnCount     int
 	Gravity       Gravity
 	Difficulty    string
-	Username      string
+	Username      string // kept for backward compatibility
+	Username1     string
+	Username2     string
 	Mode          string // "normal" ou "inverse"
 	GameMode      GameMode
 	AILevel       AILevel
@@ -59,7 +61,7 @@ var (
 // Durée du délai en millisecondes entre le coup du joueur et celui de l'IA
 var aiDelayMs = 1000
 
-func NewGame(rows, cols, prefill int, difficulty, username, mode, skin string, gameMode GameMode, aiLevel AILevel) *Game {
+func NewGame(rows, cols, prefill int, difficulty, username1, username2, mode, skin string, gameMode GameMode, aiLevel AILevel) *Game {
 	board := make([][]int, rows)
 	for i := range board {
 		board[i] = make([]int, cols)
@@ -81,6 +83,9 @@ func NewGame(rows, cols, prefill int, difficulty, username, mode, skin string, g
 	} else {
 		gravity = GravityDown
 	}
+	if gameMode == ModeHumanVsAI && username2 == "" {
+		username2 = "IA"
+	}
 	return &Game{
 		Board:         board,
 		Rows:          rows,
@@ -93,7 +98,9 @@ func NewGame(rows, cols, prefill int, difficulty, username, mode, skin string, g
 		TurnCount:     0,
 		Gravity:       gravity,
 		Difficulty:    difficulty,
-		Username:      username,
+		Username:      username1,
+		Username1:     username1,
+		Username2:     username2,
 		Mode:          mode,
 		GameMode:      gameMode,
 		AILevel:       aiLevel,
@@ -647,12 +654,16 @@ func modeHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		mode := r.FormValue("mode")
 		username := r.FormValue("username")
+		username2 := r.FormValue("username2")
 		difficulty := r.FormValue("difficulty")
 		skin := r.FormValue("skin") // Ajout du skin
 		gamemode := r.FormValue("gamemode")
 		ailevel := r.FormValue("ailevel")
 
 		url := "/connect4?username=" + username + "&difficulty=" + difficulty + "&mode=" + mode + "&skin=" + skin + "&gamemode=" + gamemode
+		if username2 != "" {
+			url += "&username2=" + username2
+		}
 		if ailevel != "" {
 			url += "&ailevel=" + ailevel
 		}
@@ -662,6 +673,7 @@ func modeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// On récupère tous les paramètres pour les garder dans le formulaire
 	username := r.URL.Query().Get("username")
+	username2 := r.URL.Query().Get("username2")
 	difficulty := r.URL.Query().Get("difficulty")
 	skin := r.URL.Query().Get("skin") // Ajout du skin
 	gamemode := r.URL.Query().Get("gamemode")
@@ -669,6 +681,7 @@ func modeHandler(w http.ResponseWriter, r *http.Request) {
 
 	modeTmpl.Execute(w, map[string]interface{}{
 		"Username":   username,
+		"Username2":  username2,
 		"Difficulty": difficulty,
 		"Skin":       skin, // Ajout du skin
 		"GameMode":   gamemode,
@@ -680,12 +693,16 @@ func modeHandler(w http.ResponseWriter, r *http.Request) {
 func startHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		username := r.FormValue("username")
+		username2 := r.FormValue("username2")
 		difficulty := r.FormValue("difficulty")
 		skin := r.FormValue("skin")
 		gamemode := r.FormValue("gamemode")
 		ailevel := r.FormValue("ailevel")
 
 		url := "/mode?username=" + username + "&difficulty=" + difficulty + "&skin=" + skin + "&gamemode=" + gamemode
+		if username2 != "" {
+			url += "&username2=" + username2
+		}
 		if ailevel != "" {
 			url += "&ailevel=" + ailevel
 		}
@@ -701,6 +718,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	mutex.Lock()
 	defer mutex.Unlock()
 	username := r.URL.Query().Get("username")
+	username2 := r.URL.Query().Get("username2")
 	difficulty := r.URL.Query().Get("difficulty")
 	mode := r.URL.Query().Get("mode")
 	skin := r.URL.Query().Get("skin") // Ajout du skin
@@ -738,8 +756,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		rows, cols, prefill = 8, 10, 7
 	}
 
-	if game == nil || (username != "" && (game.Username != username || game.Difficulty != difficulty || game.Mode != mode || game.GameMode != gameMode || game.AILevel != aiLevel || game.Skin != skin)) {
-		game = NewGame(rows, cols, prefill, difficulty, username, mode, skin, gameMode, aiLevel)
+	if game == nil || (username != "" && (game.Username != username || game.Username2 != username2 || game.Difficulty != difficulty || game.Mode != mode || game.GameMode != gameMode || game.AILevel != aiLevel || game.Skin != skin)) {
+		game = NewGame(rows, cols, prefill, difficulty, username, username2, mode, skin, gameMode, aiLevel)
 	}
 
 	if r.Method == "POST" {
@@ -750,7 +768,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if r.FormValue("rematch") == "1" {
-			game = NewGame(rows, cols, prefill, difficulty, username, mode, skin, gameMode, aiLevel)
+			game = NewGame(rows, cols, prefill, difficulty, username, username2, mode, skin, gameMode, aiLevel)
 		} else if colStr := r.FormValue("col"); colStr != "" {
 			col, err := strconv.Atoi(colStr)
 			if err == nil {
@@ -790,6 +808,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		GameOver      bool
 		Gravity       Gravity
 		Username      string
+		Username1     string
+		Username2     string
 		Difficulty    string
 		Rows          int
 		Cols          int
@@ -805,6 +825,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		GameOver:      game.GameOver,
 		Gravity:       game.Gravity,
 		Username:      game.Username,
+		Username1:     game.Username1,
+		Username2:     game.Username2,
 		Difficulty:    game.Difficulty,
 		Rows:          game.Rows,
 		Cols:          game.Cols,

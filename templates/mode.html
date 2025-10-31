@@ -76,6 +76,9 @@
             <input type="hidden" name="skin" value="{{.Skin}}">
             <input type="hidden" name="gamemode" value="{{.GameMode}}">
             <input type="hidden" name="ailevel" value="{{.AILevel}}">
+            {{if .Username2}}
+            <input type="hidden" name="username2" value="{{.Username2}}">
+            {{end}}
             <div class="mode-choice">
                 <button class="mode-btn" name="mode" value="normal" type="submit">
                     <span class="mode-icon">⬇️</span>
