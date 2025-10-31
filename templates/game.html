@@ -165,13 +165,6 @@
     </script>
     {{end}}
     
-    {{if and (eq .GameMode 1) (eq .CurrentPlayer 2) (not .GameOver)}}
-    <script>
-    // Auto-refresh pour le tour de l'IA
-    setTimeout(function() {
-        window.location.reload();
-    }, 1500);
-    </script>
-    {{end}}
+    
 </body>
 </html>

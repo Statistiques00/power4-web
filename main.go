@@ -756,8 +756,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		rows, cols, prefill = 8, 10, 7
 	}
 
-	if game == nil || (username != "" && (game.Username != username || game.Username2 != username2 || game.Difficulty != difficulty || game.Mode != mode || game.GameMode != gameMode || game.AILevel != aiLevel || game.Skin != skin)) {
-		game = NewGame(rows, cols, prefill, difficulty, username, username2, mode, skin, gameMode, aiLevel)
+	// Normalise username2 pour le mode IA afin d'éviter une réinitialisation en boucle
+	normUsername2 := username2
+	if gameMode == ModeHumanVsAI && normUsername2 == "" {
+		normUsername2 = "IA"
+	}
+
+	if game == nil || (username != "" && (game.Username != username || game.Username2 != normUsername2 || game.Difficulty != difficulty || game.Mode != mode || game.GameMode != gameMode || game.AILevel != aiLevel || game.Skin != skin)) {
+		game = NewGame(rows, cols, prefill, difficulty, username, normUsername2, mode, skin, gameMode, aiLevel)
 	}
 
 	if r.Method == "POST" {
@@ -768,19 +774,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if r.FormValue("rematch") == "1" {
-			game = NewGame(rows, cols, prefill, difficulty, username, username2, mode, skin, gameMode, aiLevel)
+			game = NewGame(rows, cols, prefill, difficulty, username, normUsername2, mode, skin, gameMode, aiLevel)
 		} else if colStr := r.FormValue("col"); colStr != "" {
 			col, err := strconv.Atoi(colStr)
 			if err == nil {
 				game.DropToken(col)
 
-				// Si c'est le mode IA et que c'est au tour de l'IA (joueur 2)
-				if game.GameMode == ModeHumanVsAI && game.CurrentPlayer == 2 && !game.GameOver {
-					aiCol := game.aiMove()
-					if aiCol >= 0 {
-						game.DropToken(aiCol)
-					}
-				}
+				// En mode IA, ne joue PAS immédiatement ici.
+				// Le client déclenchera le coup IA après un délai (aiDelayMs) via /ai-move.
 			}
 		}
 	}
