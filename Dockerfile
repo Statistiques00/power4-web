@@ -15,6 +15,6 @@ COPY --from=builder /app/power4 ./power4
 COPY templates ./templates
 COPY style.css favicon.svg ./
 
-EXPOSE 8080
+EXPOSE 8081
 
 CMD ["./power4"]

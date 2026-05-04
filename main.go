@@ -856,8 +856,8 @@ func main() {
 		http.ServeFile(w, r, "style.css")
 	})
 	http.Handle("/favicon.svg", http.FileServer(http.Dir(".")))
-	fmt.Println("Serveur Puissance 4 Go sur http://localhost:8080/")
-	http.ListenAndServe(":8080", nil)
+	fmt.Println("Serveur Puissance 4 Go sur http://localhost:8081/")
+	http.ListenAndServe(":8081", nil)
 }
 
 // aiMoveHandler effectue le coup de l'IA lorsqu'il est appelé (endpoint POST)
