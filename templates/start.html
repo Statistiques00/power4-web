@@ -1,343 +1,130 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr" data-theme="dark">
 <head>
-    <title>Puissance 4 - Démarrer</title>
-    <link rel="stylesheet" href="/style.css?v=3">
-    <style>
-        body {
-            background: #0d1b2a;
-            color: #ffeccc;
-            font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
-            margin: 0;
-            padding: 0;
-        }
-        body.skin-classic {
-            background: #0d1b2a;
-            color: #ffeccc;
-        }
-        body.skin-neon {
-            background: #0d0d0d;
-            color: #00ffcc;
-        }
-        body.skin-retro {
-            background: #3b2f2f;
-            color: #fbe8c6;
-        }
-        .main-layout {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            gap: 4vw;
-            padding: 20px;
-        }
-        .form-panel, .preview-panel {
-            background: rgba(30,58,92,0.97);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px #0008;
-            padding: 48px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-width: 340px;
-            max-width: 400px;
-        }
-        .form-panel h1 {
-            font-family: 'Press Start 2P', 'Fira Mono', monospace;
-            font-size: 2.2em;
-            letter-spacing: 0.08em;
-            margin-bottom: 38px;
-            color: inherit;
-            text-shadow: 0 0 2px #fff2, 0 0 8px #00d9ff22, 0 0 18px #00d9ff22;
-        }
-        .form-panel label {
-            font-size: 1.25em;
-            margin-bottom: 18px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            color: inherit;
-            font-family: 'Fira Mono', monospace;
-        }
-        .form-panel input[type="text"], .form-panel select {
-            font-size: 1.1em;
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: 2px solid #274472;
-            background: #16213e;
-            color: inherit;
-            margin-top: 8px;
-            margin-bottom: 10px;
-            width: 100%;
-            font-family: inherit;
-            outline: none;
-            transition: border 0.15s;
-        }
-        .form-panel input[type="text"]:focus, .form-panel select:focus {
-            border-color: #ffe066;
-        }
-        .form-panel button {
-            padding: 12px 38px;
-            font-size: 1.25em;
-            border-radius: 10px;
-            border: 2.5px solid #ffeccc;
-            background: #1e3a5c;
-            color: inherit;
-            font-family: inherit;
-            cursor: pointer;
-            margin-top: 24px;
-            box-shadow: 0 2px 8px #0003;
-            transition: background 0.15s, color 0.15s, border 0.15s;
-        }
-        .form-panel button:hover {
-            background: #ffe066;
-            color: #1e3a5c;
-            border-color: #ffe066;
-        }
-        .preview-panel {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        /* Skin chooser cards */
-        .skin-chooser { width: 100%; }
-        .skins-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            width: 100%;
-        }
-        .skin-card {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 10px;
-            border-radius: 12px;
-            border: 2px solid #274472;
-            background: #14233a;
-            cursor: pointer;
-            transition: transform .15s, box-shadow .15s, border-color .15s, background .15s;
-            user-select: none;
-        }
-        .skin-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px #0005; border-color: #ffe066; }
-        .skin-card.selected { border-color: #ffe066; box-shadow: 0 6px 16px #0006; background: #1a2d4a; }
-        .skin-card input { position: absolute; opacity: 0; pointer-events: none; }
-        .skin-thumb {
-            width: 100%; height: 56px; border-radius: 8px;
-            display: flex; align-items: center; justify-content: space-around;
-            margin-bottom: 8px; padding: 6px;
-        }
-        .skin-thumb.classic { background: #1e3a5c; border: 2px solid #274472; }
-        .skin-thumb.neon    { background: #0d0d0d; border: 2px solid #00ffcc; }
-        .skin-thumb.retro   { background: #3b2f2f; border: 2px solid #d9534f; }
-        .skin-thumb .disc { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #ffeccc; box-shadow: 0 1px 2px #0006; }
-        .skin-thumb.classic .disc.red { background:#c44536; }
-        .skin-thumb.classic .disc.yellow { background:#ffe066; }
-        .skin-thumb.neon .disc.red { background:#ff0066; border-color:#ff99cc; }
-        .skin-thumb.neon .disc.yellow { background:#ffcc00; border-color:#ffff99; }
-        .skin-thumb.retro .disc.red { background:#d9534f; border-color:#f7c6c6; }
-        .skin-thumb.retro .disc.yellow { background:#f0ad4e; border-color:#fbe8c6; }
-        .skin-name { font-size: 0.95em; opacity: 0.95; }
-        .preview-title {
-            font-family: 'Press Start 2P', 'Fira Mono', monospace;
-            font-size: 1.3em;
-            font-weight: bold;
-            margin-bottom: 18px;
-            color: inherit;
-            text-align: center;
-            letter-spacing: 0.04em;
-        }
-        .skin-preview-board {
-            display: grid;
-            grid-template-columns: repeat(7, 60px);
-            grid-template-rows: repeat(6, 60px);
-            gap: 8px;
-            border-radius: 16px;
-            padding: 12px;
-            box-shadow: 0 6px 20px #0008;
-            margin-top: 8px;
-        }
-        .skin-preview-board.classic {
-            background: #1e3a5c;
-            border: 2px solid #274472;
-        }
-        .skin-preview-board.neon {
-            background: #0d0d0d;
-            border: 2px solid #00ffcc;
-        }
-        .skin-preview-board.retro {
-            background: #3b2f2f;
-            border: 2px solid #d9534f;
-        }
-        .skin-preview-cell {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            margin: 0;
-            box-shadow: 0 2px 4px #0004;
-        }
-        .skin-preview-cell.red {
-            background: #c44536;
-        }
-        .skin-preview-cell.yellow {
-            background: #ffe066;
-        }
-        .skin-preview-board.neon .skin-preview-cell.red {
-            background: #ff0066;
-        }
-        .skin-preview-board.neon .skin-preview-cell.yellow {
-            background: #ffcc00;
-        }
-        .skin-preview-board.retro .skin-preview-cell.red {
-            background: #d9534f;
-        }
-        .skin-preview-board.retro .skin-preview-cell.yellow {
-            background: #f0ad4e;
-        }
-        @media (max-width: 900px) {
-            .main-layout {
-                flex-direction: column;
-                gap: 2vw;
-                padding: 20px;
-            }
-            .form-panel, .preview-panel {
-                margin: 0 auto;
-                width: 100%;
-                max-width: 400px;
-            }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puissance 4 - D&eacute;marrer</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/style.css?v=4">
+    <script>
+        (function() {
+            var saved = localStorage.getItem('power4-theme');
+            var theme = saved || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+            document.documentElement.dataset.theme = theme;
+        })();
+    </script>
 </head>
 <body class="skin-classic">
-    <div class="main-layout">
-        <form class="form-panel" method="POST">
-            <h1>Bienvenue sur Puissance 4</h1>
-            <label id="username1-label">
-                <span id="username1-text">Nom du joueur 1 :</span>
-                <input id="username-input" type="text" name="username" required autocomplete="off" maxlength="16" placeholder="Joueur 1">
-            </label>
-            <label id="username2-label" style="display:none;">
-                Nom du joueur 2 :
-                <input type="text" name="username2" autocomplete="off" maxlength="16" placeholder="Joueur 2">
-            </label>
-            <label>
-                Difficulté :
-                <select name="difficulty">
-                    <option value="easy">Facile (6x7)</option>
-                    <option value="normal">Normal (7x8)</option>
-                    <option value="hard">Difficile (8x10)</option>
-                </select>
-            </label>
-            <label>
-                Mode de jeu :
-                <select name="gamemode" id="gamemode-select">
-                    <option value="human">Joueur vs Joueur</option>
-                    <option value="ai">Joueur vs IA</option>
-                </select>
-            </label>
-            <label id="ai-level-label" style="display:none;">
-                Niveau de l'IA :
-                <select name="ailevel">
-                    <option value="easy">Facile</option>
-                    <option value="medium">Moyen</option>
-                    <option value="hard">Difficile</option>
-                </select>
-            </label>
-            <div class="skin-chooser">
-                <div style="margin-bottom:12px; font-size:1.25em; text-align:left; width:100%;">Skin :</div>
-                <div class="skins-grid">
-                    <label class="skin-card selected" data-skin="classic" title="Classique">
-                        <input type="radio" name="skin" value="classic" checked>
-                        <div class="skin-thumb classic">
-                            <span class="disc red"></span>
-                            <span class="disc yellow"></span>
-                            <span class="disc red"></span>
-                        </div>
-                        <div class="skin-name">Classique</div>
-                    </label>
-                    <label class="skin-card" data-skin="neon" title="Néon">
-                        <input type="radio" name="skin" value="neon">
-                        <div class="skin-thumb neon">
-                            <span class="disc red"></span>
-                            <span class="disc yellow"></span>
-                            <span class="disc red"></span>
-                        </div>
-                        <div class="skin-name">Néon</div>
-                    </label>
-                    <label class="skin-card" data-skin="retro" title="Rétro">
-                        <input type="radio" name="skin" value="retro">
-                        <div class="skin-thumb retro">
-                            <span class="disc red"></span>
-                            <span class="disc yellow"></span>
-                            <span class="disc red"></span>
-                        </div>
-                        <div class="skin-name">Rétro</div>
-                    </label>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Changer de theme"></button>
+
+    <main class="page-shell">
+        <div class="app-grid">
+            <form class="form-panel panel" method="POST">
+                <header class="brand-block">
+                    <div class="eyebrow">Power4 Web</div>
+                    <h1 class="headline">Puissance 4</h1>
+                    <p class="subcopy">Configurez une partie nette, rapide et lisible avant de lancer le plateau.</p>
+                </header>
+
+                <section class="form-section">
+                    <div class="section-title">Joueurs</div>
+                    <div class="field-grid">
+                        <label class="field full" id="username1-label">
+                            <span id="username1-text">Nom du joueur 1</span>
+                            <input id="username-input" type="text" name="username" required autocomplete="off" maxlength="16" placeholder="Joueur 1">
+                        </label>
+                        <label class="field full is-hidden" id="username2-label">
+                            <span>Nom du joueur 2</span>
+                            <input type="text" name="username2" autocomplete="off" maxlength="16" placeholder="Joueur 2">
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <div class="section-title">Param&egrave;tres</div>
+                    <div class="field-grid">
+                        <label class="field">
+                            <span>Difficult&eacute;</span>
+                            <select name="difficulty">
+                                <option value="easy">Facile (6x7)</option>
+                                <option value="normal">Normal (7x8)</option>
+                                <option value="hard">Difficile (8x10)</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>Mode de jeu</span>
+                            <select name="gamemode" id="gamemode-select">
+                                <option value="human">Joueur vs Joueur</option>
+                                <option value="ai">Joueur vs IA</option>
+                            </select>
+                        </label>
+                        <label class="field full is-hidden" id="ai-level-label">
+                            <span>Niveau de l'IA</span>
+                            <select name="ailevel">
+                                <option value="easy">Facile</option>
+                                <option value="medium">Moyen</option>
+                                <option value="hard">Difficile</option>
+                            </select>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="skin-chooser">
+                    <div class="section-title">Skin</div>
+                    <div class="skins-grid">
+                        <label class="skin-card selected" data-skin="classic" title="Classique">
+                            <input type="radio" name="skin" value="classic" checked>
+                            <span class="skin-thumb classic" aria-hidden="true">
+                                <span class="disc red"></span>
+                                <span class="disc yellow"></span>
+                                <span class="disc red"></span>
+                            </span>
+                            <span class="skin-name">Classique</span>
+                        </label>
+                        <label class="skin-card" data-skin="neon" title="N&eacute;on">
+                            <input type="radio" name="skin" value="neon">
+                            <span class="skin-thumb neon" aria-hidden="true">
+                                <span class="disc red"></span>
+                                <span class="disc yellow"></span>
+                                <span class="disc red"></span>
+                            </span>
+                            <span class="skin-name">N&eacute;on</span>
+                        </label>
+                        <label class="skin-card" data-skin="retro" title="R&eacute;tro">
+                            <input type="radio" name="skin" value="retro">
+                            <span class="skin-thumb retro" aria-hidden="true">
+                                <span class="disc red"></span>
+                                <span class="disc yellow"></span>
+                                <span class="disc red"></span>
+                            </span>
+                            <span class="skin-name">R&eacute;tro</span>
+                        </label>
+                    </div>
+                </section>
+
+                <button class="primary-action" type="submit">Commencer</button>
+            </form>
+
+            <section class="preview-panel panel" aria-label="Previsualisation du plateau">
+                <div class="preview-copy">
+                    <div class="eyebrow">Aper&ccedil;u</div>
                 </div>
-            </div>
-            
-            <div style="width:100%;display:flex;justify-content:center;">
-                <button type="submit">Commencer</button>
-            </div>
-        </form>
-        <div class="preview-panel">
-            <div class="preview-title">Prévisualisation du Skin</div>
-            <div class="skin-preview-board classic" id="skin-preview">
-                <!-- Preview cells -->
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-                <div class="skin-preview-cell red"></div>
-                <div class="skin-preview-cell yellow"></div>
-            </div>
+                <div class="preview-stage">
+                    <div class="skin-preview-board classic" id="skin-preview"></div>
+                </div>
+            </section>
         </div>
-    </div>
+    </main>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', function() {
+                const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+                document.documentElement.dataset.theme = next;
+                localStorage.setItem('power4-theme', next);
+            });
+
             const skinPreview = document.getElementById('skin-preview');
             const body = document.body;
             const skinCards = Array.from(document.querySelectorAll('.skin-card'));
@@ -346,37 +133,52 @@
             const username2Label = document.getElementById('username2-label');
             const username1Text = document.getElementById('username1-text');
             const usernameInput = document.getElementById('username-input');
-            function applySkin(skin) {
-                skinPreview.className = 'skin-preview-board ' + skin;
-                body.className = 'skin-' + skin;
-                skinCards.forEach(c => c.classList.toggle('selected', c.dataset.skin === skin));
+
+            function buildPreview() {
+                skinPreview.innerHTML = '';
+                for (let i = 0; i < 42; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'skin-preview-cell';
+                    if ([2, 3, 8, 10, 15, 17, 22, 23, 29, 31, 37, 38].includes(i)) {
+                        cell.classList.add(i % 2 === 0 ? 'red' : 'yellow');
+                    }
+                    skinPreview.appendChild(cell);
+                }
             }
-            skinCards.forEach(card => {
-                card.addEventListener('click', () => {
+
+            function applySkin(skin) {
+                skinPreview.classList.add('is-changing');
+                window.setTimeout(function() { skinPreview.classList.remove('is-changing'); }, 180);
+                skinPreview.className = 'skin-preview-board ' + skin + ' is-changing';
+                body.className = 'skin-' + skin;
+                skinCards.forEach(function(card) {
+                    card.classList.toggle('selected', card.dataset.skin === skin);
+                });
+            }
+
+            skinCards.forEach(function(card) {
+                card.addEventListener('click', function() {
                     const input = card.querySelector('input[type="radio"]');
                     input.checked = true;
                     applySkin(input.value);
                 });
                 const input = card.querySelector('input[type="radio"]');
-                input.addEventListener('change', () => applySkin(input.value));
+                input.addEventListener('change', function() {
+                    applySkin(input.value);
+                });
             });
-            // init with checked value
-            const checked = document.querySelector('.skin-card input[type="radio"]:checked');
-            if (checked) applySkin(checked.value);
 
             function toggleByMode() {
                 const isAI = gamemodeSelect.value === 'ai';
-                aiLevelLabel.style.display = isAI ? 'flex' : 'none';
-                username2Label.style.display = isAI ? 'none' : 'flex';
-                // Mettre à jour le libellé et le placeholder du joueur 1 selon le mode
-                if (isAI) {
-                    username1Text.textContent = 'Nom du joueur :';
-                    if (usernameInput.placeholder === 'Joueur 1') usernameInput.placeholder = 'Votre pseudo';
-                } else {
-                    username1Text.textContent = 'Nom du joueur 1 :';
-                    if (usernameInput.placeholder === 'Votre pseudo') usernameInput.placeholder = 'Joueur 1';
-                }
+                aiLevelLabel.classList.toggle('is-hidden', !isAI);
+                username2Label.classList.toggle('is-hidden', isAI);
+                username1Text.textContent = isAI ? 'Nom du joueur' : 'Nom du joueur 1';
+                usernameInput.placeholder = isAI ? 'Votre pseudo' : 'Joueur 1';
             }
+
+            buildPreview();
+            const checked = document.querySelector('.skin-card input[type="radio"]:checked');
+            if (checked) applySkin(checked.value);
             gamemodeSelect.addEventListener('change', toggleByMode);
             toggleByMode();
         });

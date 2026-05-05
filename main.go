@@ -58,9 +58,6 @@ var (
 	mutex sync.Mutex
 )
 
-// Durée du délai en millisecondes entre le coup du joueur et celui de l'IA
-var aiDelayMs = 1000
-
 func NewGame(rows, cols, prefill int, difficulty, username1, username2, mode, skin string, gameMode GameMode, aiLevel AILevel) *Game {
 	board := make([][]int, rows)
 	for i := range board {
@@ -484,6 +481,19 @@ func (g *Game) aiMove() int {
 	}
 }
 
+func (g *Game) playAIMoveIfNeeded() bool {
+	if g == nil || g.GameMode != ModeHumanVsAI || g.GameOver || g.CurrentPlayer != 2 {
+		return false
+	}
+
+	aiCol := g.aiMove()
+	if aiCol < 0 {
+		return false
+	}
+
+	return g.DropToken(aiCol)
+}
+
 // getWinningPositions retourne les positions des 4 jetons gagnants si victoire, sinon nil.
 func (g *Game) getWinningPositions() [][2]int {
 	player := g.Winner
@@ -605,14 +615,6 @@ func renderBoard(g *Game) template.HTML {
 			});
 		})();
 		</script>`
-	}
-
-	// Si c'est au tour de l'IA en mode Humain vs IA, on lance un fetch vers /ai-move après un délai
-	if g.GameMode == ModeHumanVsAI && g.CurrentPlayer == 2 && !g.GameOver {
-		// expose le délai en ms via data attribute et lance le fetch après le délai
-		html += "<script>" +
-		"(function(){ var delay=" + strconv.Itoa(aiDelayMs) + "; setTimeout(function(){ fetch('/ai-move', {method: 'POST'}).then(function(){ window.location.reload(); }); }, delay); })();" +
-		"</script>"
 	}
 
 	return template.HTML(html)
@@ -777,11 +779,14 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			game = NewGame(rows, cols, prefill, difficulty, username, normUsername2, mode, skin, gameMode, aiLevel)
 		} else if colStr := r.FormValue("col"); colStr != "" {
 			col, err := strconv.Atoi(colStr)
-			if err == nil {
-				game.DropToken(col)
-
-				// En mode IA, ne joue PAS immédiatement ici.
-				// Le client déclenchera le coup IA après un délai (aiDelayMs) via /ai-move.
+			if err == nil && game != nil && !game.GameOver {
+				if game.GameMode == ModeHumanVsAI {
+					if game.CurrentPlayer == 1 && game.DropToken(col) {
+						game.playAIMoveIfNeeded()
+					}
+				} else {
+					game.DropToken(col)
+				}
 			}
 		}
 	}
@@ -876,10 +881,7 @@ func aiMoveHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	aiCol := game.aiMove()
-	if aiCol >= 0 {
-		game.DropToken(aiCol)
-	}
+	game.playAIMoveIfNeeded()
 
 	// OK
 	w.WriteHeader(http.StatusOK)

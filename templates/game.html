@@ -1,170 +1,106 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr" data-theme="dark">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Puissance 4</title>
-    <link rel="stylesheet" href="/style.css?v=3">
-    <style>
-        body.skin-classic {
-            background: #0d1b2a;
-            color: #ffeccc;
-        }
-        body.skin-neon {
-            background: #0d0d0d;
-            color: #00ffcc;
-        }
-        body.skin-retro {
-            background: #3b2f2f;
-            color: #fbe8c6;
-        }
-        .game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .game-title {
-            font-family: 'Press Start 2P', 'Fira Mono', monospace;
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            text-align: center;
-            text-shadow: 0 0 2px #fff2, 0 0 8px #00d9ff22, 0 0 18px #00d9ff22;
-        }
-        .game-board {
-            margin-top: 20px;
-        }
-        .controls {
-            margin-top: 20px;
-            transition: opacity 0.3s ease;
-        }
-        .controls.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .controls button {
-            padding: 10px 20px;
-            font-size: 1em;
-            border-radius: 8px;
-            border: 2px solid #ffeccc;
-            background: #1e3a5c;
-            color: inherit;
-            cursor: pointer;
-            transition: background 0.15s, color 0.15s, border 0.15s;
-        }
-        .controls button:hover {
-            background: #ffe066;
-            color: #1e3a5c;
-            border-color: #ffe066;
-        }
-        .end-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(13,27,42,0.97);
-            color: #ffeccc;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Press Start 2P', monospace;
-            font-size: 2.5em;
-            letter-spacing: 0.06em;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.5s cubic-bezier(.4,2,.6,.9);
-        }
-        .end-overlay.visible {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .end-overlay .end-msg {
-            text-shadow: 0 0 8px #ffe066, 0 0 24px #c44536;
-            margin-bottom: 32px;
-        }
-        .end-overlay .end-btns {
-            margin-top: 24px;
-        }
-        .end-overlay button {
-            font-size: 1.1em;
-            padding: 12px 32px;
-            border-radius: 8px;
-            border: 2.5px solid #ffeccc;
-            background: #0d1b2a;
-            color: #ffeccc;
-            font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
-            cursor: pointer;
-            margin: 0 12px;
-            transition: background 0.15s, color 0.15s, border 0.15s;
-        }
-        .end-overlay button:hover {
-            background: #ffe066;
-            color: #0d1b2a;
-            border-color: #ffe066;
-        }
-        @keyframes drop {
-            0% {
-                transform: translateY(-100px);
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-        .token-wrap.just-played {
-            animation: drop 0.4s ease-out;
-        }
-    </style>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/style.css?v=4">
+    <script>
+        (function() {
+            var saved = localStorage.getItem('power4-theme');
+            var theme = saved || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+            document.documentElement.dataset.theme = theme;
+        })();
+    </script>
 </head>
 <body class="skin-{{.Skin}}">
-    <div class="game-container">
-        <h1 class="game-title">Puissance 4</h1>
-        <h2>
-        {{if eq .GameMode 0}}
-            Joueur 1 : {{.Username1}} | Joueur 2 : {{.Username2}} | Difficulté : {{.Difficulty}}
-        {{else}}
-            Joueur : {{.Username1}} | Difficulté : {{.Difficulty}} | Mode : VS IA ({{if eq .AILevel 0}}Facile{{else if eq .AILevel 1}}Moyen{{else}}Difficile{{end}})
-        {{end}}
-        </h2>
-        <div class="game-board">
-            {{.BoardHTML}}
-        </div>
-        <div class="controls" id="controls">
-            <form method="POST">
-                {{if .GameOver}}
-                    <button name="rematch" value="1">Revanche</button>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Changer de theme"></button>
+
+    <main class="game-shell">
+        <aside class="game-info panel">
+            <header class="game-title">
+                <div class="eyebrow">Power4 Web</div>
+                <h1>Puissance 4</h1>
+                <p class="subcopy">Placez votre pion, anticipez la ligne, gardez le plateau lisible.</p>
+            </header>
+
+            <section class="meta-list" aria-label="Details de la partie">
+                {{if eq .GameMode 0}}
+                <div class="meta-item"><span>Joueur 1</span><strong>{{.Username1}}</strong></div>
+                <div class="meta-item"><span>Joueur 2</span><strong>{{.Username2}}</strong></div>
+                {{else}}
+                <div class="meta-item"><span>Joueur</span><strong>{{.Username1}}</strong></div>
+                <div class="meta-item"><span>Mode</span><strong>VS IA</strong></div>
+                <div class="meta-item">
+                    <span>IA</span>
+                    <strong>{{if eq .AILevel 0}}Facile{{else if eq .AILevel 1}}Moyen{{else}}Difficile{{end}}</strong>
+                </div>
                 {{end}}
-            </form>
-        </div>
-    </div>
+                <div class="meta-item"><span>Difficult&eacute;</span><strong>{{.Difficulty}}</strong></div>
+                <div class="meta-item"><span>Gravit&eacute;</span><strong>{{if eq .Mode "inverse"}}Invers&eacute;e{{else}}Normale{{end}}</strong></div>
+            </section>
+
+            <section class="turn-card" aria-live="polite">
+                {{if .GameOver}}
+                <div class="turn-label">Etat de jeu</div>
+                <div class="turn-player">{{.EndMessage}}</div>
+                {{else}}
+                <div class="turn-label">Tour actuel</div>
+                <div class="turn-player">
+                    <span class="turn-dot {{if eq .CurrentPlayer 2}}p2{{end}}" aria-hidden="true"></span>
+                    {{if eq .CurrentPlayer 1}}
+                        {{.Username1}}
+                    {{else}}
+                        {{if eq .GameMode 1}}IA{{else}}{{.Username2}}{{end}}
+                    {{end}}
+                </div>
+                {{end}}
+            </section>
+        </aside>
+
+        <section class="game-stage panel">
+            <div class="game-board">
+                {{.BoardHTML}}
+            </div>
+        </section>
+    </main>
 
     {{if .EndMessage}}
     <div id="endOverlay" class="end-overlay">
-        <div class="end-msg">{{.EndMessage}}</div>
-        <div class="end-btns">
-            <form method="POST" style="display:inline;">
-                <button name="rematch" value="1" type="submit">Revanche</button>
-            </form>
-            <form method="POST" style="display:inline;">
-                <button name="reset" value="1" type="submit">Nouvelle partie</button>
-            </form>
+        <div class="end-dialog panel">
+            <div class="eyebrow">Partie termin&eacute;e</div>
+            <div class="end-msg">{{.EndMessage}}</div>
+            <div class="end-btns">
+                <form method="POST">
+                    <button name="rematch" value="1" type="submit">Revanche</button>
+                </form>
+                <form method="POST">
+                    <button name="reset" value="1" type="submit">Nouvelle partie</button>
+                </form>
+            </div>
         </div>
     </div>
-    <script>
-    window.addEventListener('DOMContentLoaded', function() {
-        const endOverlay = document.getElementById('endOverlay');
-        const controls = document.getElementById('controls');
-        setTimeout(function() {
-            endOverlay.classList.add('visible');
-            controls.classList.add('hidden'); // Cache les boutons de base
-        }, 200);
-    });
-    </script>
     {{end}}
-    
-    
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            themeToggle.addEventListener('click', function() {
+                const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+                document.documentElement.dataset.theme = next;
+                localStorage.setItem('power4-theme', next);
+            });
+
+            const endOverlay = document.getElementById('endOverlay');
+            if (endOverlay) {
+                const controls = document.querySelector('.game-board .controls');
+                window.setTimeout(function() {
+                    endOverlay.classList.add('visible');
+                    if (controls) controls.classList.add('hidden');
+                }, 220);
+            }
+        });
+    </script>
 </body>
 </html>

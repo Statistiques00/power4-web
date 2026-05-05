@@ -1,11 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr" data-theme="dark">
 <head>
-    <title>Défaite</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D&eacute;faite</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/style.css?v=4">
+    <script>
+        (function() {
+            var saved = localStorage.getItem('power4-theme');
+            var theme = saved || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+            document.documentElement.dataset.theme = theme;
+        })();
+    </script>
 </head>
 <body>
-    <h1>Dommage {{.Username}}, tu as perdu !</h1>
-    <a href="{{.RematchURL}}">Revanche</a>
-    <a href="/">Retour à l'accueil</a>
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Changer de theme"></button>
+    <main class="mode-shell">
+        <section class="result-card panel">
+            <div class="eyebrow">Fin de partie</div>
+            <h1>Dommage {{.Username}}</h1>
+            <p class="subcopy">Le plateau est pr&ecirc;t pour une revanche.</p>
+            <div class="result-actions">
+                <a href="{{.RematchURL}}">Revanche</a>
+                <a href="/">Accueil</a>
+            </div>
+        </section>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('theme-toggle').addEventListener('click', function() {
+                const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+                document.documentElement.dataset.theme = next;
+                localStorage.setItem('power4-theme', next);
+            });
+        });
+    </script>
 </body>
 </html>
